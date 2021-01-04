@@ -1,0 +1,30 @@
+plugins {
+  id 'java-library'
+  id 'com.github.johnrengelman.shadow' version '5.0.0'
+  id 'java'
+}
+
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
+dependencies {
+  // Local CraftBukkit jar (1092)
+  implementation files('lib/CraftBukkit1092.jar')
+  implementation files('lib/Permissions.jar')
+  implementation files('lib/PermissionsEx-1.12.jar')
+
+  compile 'com.mashape.unirest:unirest-java:1.4.9'
+  compile 'com.google.code.gson:gson:2.8.5'
+  compile 'joda-time:joda-time:2.10.1'
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+shadowJar {
+    configurations = [project.configurations.compile]
+}
+
+compileJava.options.encoding = 'UTF-8'
