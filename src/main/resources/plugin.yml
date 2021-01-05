@@ -2,7 +2,7 @@ name: AetherVPN
 main: com.icebergcraft.aethervpn.Main
 description: Block players from using VPNs on your server!
 author: Johnanater
-version: 1.0.0.0
+version: 1.1.0
 softdepend: [PermissionsEx, Permissions]
 commands:
     aethervpn:

@@ -1,4 +1,4 @@
-package com.icebergcraft.aethervpn;
+package com.icebergcraft.aethervpn.model;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.icebergcraft.aethervpn;
+package com.icebergcraft.aethervpn.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,6 +7,9 @@ import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.util.Optional;
 
+import com.icebergcraft.aethervpn.Main;
+import com.icebergcraft.aethervpn.model.CacheModel;
+import com.icebergcraft.aethervpn.model.IpInfo;
 import org.joda.time.DateTime;
 
 import com.google.gson.Gson;

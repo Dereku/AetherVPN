@@ -2,6 +2,13 @@ package com.icebergcraft.aethervpn;
 
 import java.text.MessageFormat;
 
+import com.avaje.ebeaninternal.server.core.Message;
+import com.icebergcraft.aethervpn.listener.AVPlayerListener;
+import com.icebergcraft.aethervpn.model.IpInfo;
+import com.icebergcraft.aethervpn.util.CacheUtils;
+import com.icebergcraft.aethervpn.util.ConfigUtils;
+import com.icebergcraft.aethervpn.util.Logging;
+import com.icebergcraft.aethervpn.util.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,7 +34,7 @@ public class Main extends JavaPlugin
 	
 	private final AVPlayerListener playerListener = new AVPlayerListener();
 	
-	String version = "1.0.1";
+	private final String version = "1.1.0";
 	
 	public void onEnable()
 	{
@@ -42,7 +49,7 @@ public class Main extends JavaPlugin
 		PluginManager pm = getServer().getPluginManager();
 		
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
-		Logging.LogInfo(String.format("Loaded %s by Johnanater, version: %s",  getDescription().getName(), version));
+		Logging.LogInfo(MessageFormat.format("Loaded {0} by Johnanater, version: {1}",  getDescription().getName(), version));
 	}
 	
 	public void onDisable()
@@ -79,7 +86,7 @@ public class Main extends JavaPlugin
     		return true;
     	}
     	
-    	if (cmd.getName().equalsIgnoreCase("lookup") && hasPermission((Player)sender, "aethervpn.lookup"))
+    	if (cmd.getName().equalsIgnoreCase("lookup") && hasPermission((Player) sender, "aethervpn.lookup"))
     	{
     		if (args.length == 0)
     		{
@@ -104,7 +111,7 @@ public class Main extends JavaPlugin
     		return true;
     	}
     	
-    	if (cmd.getName().equalsIgnoreCase("aethervpn") && hasPermission((Player)sender, "aethervpn"))
+    	if (cmd.getName().equalsIgnoreCase("aethervpn") && hasPermission((Player) sender, "aethervpn"))
     	{
     		// Display version info
     		if (args.length == 0)

@@ -1,6 +1,9 @@
-package com.icebergcraft.aethervpn;
+package com.icebergcraft.aethervpn.util;
 
 import com.google.gson.Gson;
+import com.icebergcraft.aethervpn.Main;
+import com.icebergcraft.aethervpn.model.IpInfo;
+import com.icebergcraft.aethervpn.model.VPNBlockerRootObject;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.bukkit.entity.Player;

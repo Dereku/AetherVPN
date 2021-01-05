@@ -1,4 +1,4 @@
-package com.icebergcraft.aethervpn;
+package com.icebergcraft.aethervpn.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

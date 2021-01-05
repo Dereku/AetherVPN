@@ -1,8 +1,9 @@
-package com.icebergcraft.aethervpn;
+package com.icebergcraft.aethervpn.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
+import com.icebergcraft.aethervpn.model.ConfigModel;
 
 import java.io.*;
 import java.util.Properties;

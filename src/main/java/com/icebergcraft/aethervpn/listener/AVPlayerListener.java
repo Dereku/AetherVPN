@@ -1,5 +1,6 @@
-package com.icebergcraft.aethervpn;
+package com.icebergcraft.aethervpn.listener;
 
+import com.icebergcraft.aethervpn.Main;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
