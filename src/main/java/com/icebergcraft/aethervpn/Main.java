@@ -36,7 +36,8 @@ public class Main extends JavaPlugin
 		CACHE = new Cache();
 		CONFIG = new Config();
 		
-		INSTANCE.CONFIG.checkConfig();
+		CONFIG.checkConfig();
+		CACHE.setupCache();
 		
 		PluginManager pm = getServer().getPluginManager();
 		
@@ -131,7 +132,7 @@ public class Main extends JavaPlugin
     		// Clear cache
     		if (args[0].equalsIgnoreCase("clearcache"))
     		{
-    			CACHE.ClearCache();
+    			CACHE.clearCache();
     			sender.sendMessage("Cleared IP cache!");
     			return true;
     		}

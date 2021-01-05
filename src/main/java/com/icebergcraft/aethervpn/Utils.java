@@ -1,6 +1,7 @@
 package com.icebergcraft.aethervpn;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 
 import org.bukkit.entity.Player;
 import org.joda.time.DateTime;
@@ -64,18 +65,9 @@ public class Utils
 	// Get IpInfo
 	public IpInfo getIpInfo(String ip)
 	{
-		IpInfo ipInfo;
-		
-		if (Main.INSTANCE.CACHE.isCached(ip))
-		{
-			ipInfo = Main.INSTANCE.CACHE.getCachedIpInfo(ip);
-		}
-		else
-		{
-			ipInfo = DownloadIpInfo(ip);
-		}
-		
-		return ipInfo;
+		Optional<IpInfo> ipInfoCached = Main.INSTANCE.CACHE.getCachedIpInfo(ip);
+
+		return ipInfoCached.orElseGet(() -> DownloadIpInfo(ip));
 	}
 	
 	// Download IpInfo from API

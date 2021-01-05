@@ -1,6 +1,6 @@
 plugins {
   id 'java-library'
-  id 'com.github.johnrengelman.shadow' version '5.0.0'
+  id 'com.github.johnrengelman.shadow' version '6.1.0'
   id 'java'
 }
 
@@ -20,11 +20,11 @@ dependencies {
   compile 'joda-time:joda-time:2.10.1'
 }
 
+shadowJar {
+  configurations = [project.configurations.compile]
+}
+
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
-
-shadowJar {
-    configurations = [project.configurations.compile]
-}
 
 compileJava.options.encoding = 'UTF-8'

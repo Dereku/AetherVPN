@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 import org.joda.time.DateTime;
 
@@ -16,87 +17,73 @@ import com.google.gson.stream.JsonReader;
 
 public class Cache
 {
-	public final String CACHE_FILE = "plugins/AetherVPN/cache.json";
-	private final File CACHE = new File(CACHE_FILE);
-	
-	public void CheckCache()
+	public final String CACHE_FILE_LOC = "plugins/AetherVPN/cache.json";
+	private final File CACHE_FILE = new File(CACHE_FILE_LOC);
+	public static ListIpInfo CACHE;
+
+	public void setupCache()
 	{
-		if (!CACHE.exists())
+		checkCache();
+
+		// setup the variable
+		load();
+	}
+
+	public void checkCache()
+	{
+		if (!CACHE_FILE.exists())
 		{
-			CreateCache();
+			createCache();
 		}
 	}
 	
 	public boolean isCached(String ip)
 	{
-		CheckCache();
-		
-		try
+		Optional<IpInfo> ipInfo = CACHE.getIpList().stream().filter(i -> i.ipAddress.equals(ip)).findFirst();
+
+		if (ipInfo.isPresent())
 		{
-			JsonReader reader = new JsonReader(new FileReader(CACHE_FILE));
-			
-			ListIpInfo jsonString = new Gson().fromJson(reader, ListIpInfo.class);
-			
-			for (IpInfo ipInfo : jsonString.getIpList())
+			int days = Integer.parseInt(Main.INSTANCE.CONFIG.get("cacheTimeDays"));
+
+			// Cache expired
+			if (Main.INSTANCE.CONFIG.get("expireCache").equals("true") && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now()))
 			{
-				if (ipInfo.ipAddress.equals(ip))
-				{
-					int days = Integer.parseInt(Main.INSTANCE.CONFIG.get("cacheTimeDays"));
-					
-					// Cache expired
-					if (Main.INSTANCE.CONFIG.get("expireCache").equals("true") && ipInfo.instant.toDateTime().plusDays(days).isBefore(DateTime.now()))
-					{
-						removeFromCache(ipInfo);
-						return false;
-					}
-					return true;
-				}
-			}			
+				removeFromCache(ipInfo.get());
+				return false;
+			}
+			return true;
 		}
-		catch (Exception ex)
-		{
-			Logging.LogError("Error checking if IP is cached");
-			ex.printStackTrace();
-		}
+
 		return false;
 	}
 	
-	public IpInfo getCachedIpInfo(String ip)
+	public Optional<IpInfo> getCachedIpInfo(String ip)
 	{
-		IpInfo ipInfo = new IpInfo();
-		
-		JsonReader reader;
-		try
+		Optional<IpInfo> ipInfo = CACHE.getIpList().stream().filter(i -> i.ipAddress.equals(ip)).findFirst();
+
+		if (ipInfo.isPresent())
 		{
-			reader = new JsonReader(new FileReader(CACHE_FILE));
-			ListIpInfo jsonString = new Gson().fromJson(reader, ListIpInfo.class);
-			
-			for (IpInfo cachedIpInfo : jsonString.getIpList())
+			int days = Integer.parseInt(Main.INSTANCE.CONFIG.get("cacheTimeDays"));
+
+			// Cache expired
+			if (Main.INSTANCE.CONFIG.get("expireCache").equals("true") && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now()))
 			{
-				if (cachedIpInfo.ipAddress.equals(ip))
-				{
-					ipInfo = cachedIpInfo;
-					break;
-				}
+				removeFromCache(ipInfo.get());
+				return Optional.empty();
 			}
+			return ipInfo;
 		}
-		catch (FileNotFoundException ex)
-		{
-			Logging.LogError("Error getting cached IpInfo!");
-			ex.printStackTrace();
-		}
-		
-		return ipInfo;
+		return Optional.empty();
 	}
 	
-	public void CreateCache()
+	public void createCache()
 	{
 		try
 		{
-			CACHE.getParentFile().mkdirs();
-			CACHE.createNewFile();
+			CACHE_FILE.getParentFile().mkdirs();
+			CACHE_FILE.createNewFile();
 			
-			FileOutputStream outputStream = new FileOutputStream(CACHE);
+			FileOutputStream outputStream = new FileOutputStream(CACHE_FILE);
 			OutputStreamWriter osWriter = new OutputStreamWriter(outputStream);
 			
 			osWriter.write("{ \"IPList\": [] }");
@@ -108,70 +95,64 @@ public class Cache
 			Logging.LogError("Error creating cache!");
 			ex.printStackTrace();
 		}
-
 	}
 	
-	public void ClearCache()
+	public void clearCache()
 	{
-		CACHE.delete();
-		CheckCache();
+		CACHE_FILE.delete();
+		checkCache();
 	}
 	
 	public void addToCache(IpInfo ipInfo)
 	{
-		CheckCache();
-		
-		try
-		{
-			JsonReader reader = new JsonReader(new FileReader(CACHE_FILE));
-			
-			ListIpInfo jsonString = new Gson().fromJson(reader, ListIpInfo.class);
-			
-			jsonString.getIpList().add(ipInfo);
-			
-			Type listType = new TypeToken<ListIpInfo>(){}.getType();
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			String newJson = gson.toJson(jsonString, listType);
-			
-			FileOutputStream outputStream = new FileOutputStream(CACHE_FILE);
-			OutputStreamWriter osWriter = new OutputStreamWriter(outputStream);
-			
-			osWriter.write(newJson);
-			osWriter.close();
-			outputStream.close();
-		}
-		catch (Exception ex)
-		{
-			Logging.LogError("Error adding to cache!");
-			ex.printStackTrace();
-		}
+		CACHE.addIpInfo(ipInfo);
+		scheduleSave();
 	}
 	
 	public void removeFromCache(IpInfo ipInfo)
 	{
+		CACHE.removeIpInfo(ipInfo);
+		scheduleSave();
+	}
+
+	public void load()
+	{
+		JsonReader reader;
 		try
 		{
-			JsonReader reader = new JsonReader(new FileReader(CACHE_FILE));
-			
-			ListIpInfo jsonString = new Gson().fromJson(reader, ListIpInfo.class);
-			
-			jsonString.getIpList().removeIf(cachedIpInfo -> cachedIpInfo.ipAddress.equals(ipInfo.ipAddress));
-			
+			reader = new JsonReader(new FileReader(CACHE_FILE_LOC));
+			CACHE = new Gson().fromJson(reader, ListIpInfo.class);
+		}
+		catch (FileNotFoundException ex)
+		{
+			Logging.LogError(ex);
+		}
+	}
+
+	public void save()
+	{
+		try
+		{
 			Type listType = new TypeToken<ListIpInfo>(){}.getType();
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			String newJson = gson.toJson(jsonString, listType);
-			
-			FileOutputStream outputStream = new FileOutputStream(CACHE_FILE);
-			OutputStreamWriter osWriter = new OutputStreamWriter(outputStream);
-			
-			osWriter.write(newJson);
-			osWriter.close();
+			String newJson = gson.toJson(CACHE, listType);
+
+			FileOutputStream outputStream = new FileOutputStream(CACHE_FILE_LOC);
+			OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+
+			writer.write(newJson);
+			writer.close();
 			outputStream.close();
 		}
 		catch (Exception ex)
 		{
-			Logging.LogError("Error removing from cache!");
+			Logging.LogError("Error saving cache!");
 			ex.printStackTrace();
 		}
+	}
+
+	public void scheduleSave()
+	{
+		Main.INSTANCE.getServer().getScheduler().scheduleAsyncDelayedTask(Main.INSTANCE, this::save, 0L);
 	}
 }

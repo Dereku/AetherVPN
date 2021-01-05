@@ -11,11 +11,23 @@ public class ListIpInfo
 	@Expose
 	private List<IpInfo> ipList = null;
 
-	public List<IpInfo> getIpList() {
-	return ipList;
+	public List<IpInfo> getIpList()
+	{
+		return ipList;
 	}
 
-	public void setIpList(List<IpInfo> iPList) {
-	this.ipList = iPList;
+	public void setIpList(List<IpInfo> ipList)
+	{
+		this.ipList = ipList;
+	}
+
+	public void addIpInfo(IpInfo ipInfo)
+	{
+		ipList.add(ipInfo);
+	}
+
+	public void removeIpInfo(IpInfo ipinfo)
+	{
+		ipList.removeIf(i -> i.ipAddress.equals(ipinfo.ipAddress));
 	}
 }
