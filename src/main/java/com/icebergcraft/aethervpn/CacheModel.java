@@ -1,15 +1,16 @@
 package com.icebergcraft.aethervpn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ListIpInfo
+public class CacheModel
 {
-	@SerializedName("IPList")
+	@SerializedName("Cache")
 	@Expose
-	private List<IpInfo> ipList = null;
+	private List<IpInfo> ipList = new ArrayList<>();
 
 	public List<IpInfo> getIpList()
 	{

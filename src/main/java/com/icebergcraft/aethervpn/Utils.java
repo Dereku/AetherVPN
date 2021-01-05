@@ -1,14 +1,14 @@
 package com.icebergcraft.aethervpn;
 
-import java.text.MessageFormat;
-import java.util.Optional;
-
-import org.bukkit.entity.Player;
-import org.joda.time.DateTime;
-
 import com.google.gson.Gson;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.bukkit.entity.Player;
+import org.joda.time.DateTime;
+
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Optional;
 
 public class Utils 
 {	
@@ -18,13 +18,13 @@ public class Utils
 		IpInfo ipInfo = getIpInfo(getPlayerIp(player));
 		
 		// Log joins
-		if (Main.INSTANCE.CONFIG.get("logJoins").equals("true"))
+		if (ConfigUtils.CONFIG.isLogJoins())
 		{
 			Logging.LogInfo(MessageFormat.format("{0} has joined with the IP: {1} Org: {2}", player.getName(), ipInfo.ipAddress, ipInfo.org));
 		}
 		
 		// Alert online staff members
-		if (Main.INSTANCE.CONFIG.get("alertOnlineStaff").equals("true"))
+		if (ConfigUtils.CONFIG.isAlertOnlineStaff())
 		{
 			for (Player staff : Main.INSTANCE.getServer().getOnlinePlayers())
 			{
@@ -36,18 +36,18 @@ public class Utils
 		}
 		
 		if (ipInfo.isHost && 
-			Main.INSTANCE.CONFIG.get("blockVPNs").equals("true") &&
+			ConfigUtils.CONFIG.getBlockVPNs() &&
 			!isWhitelisted(ipInfo.ipAddress) &&
 			!canBypass(player))
 		{
 			// Log kicks
-			if (Main.INSTANCE.CONFIG.get("logJoins").equals("true"))
+			if (ConfigUtils.CONFIG.isLogJoins())
 			{
 				Logging.LogInfo(MessageFormat.format("{0} has been kicked for using a VPN! (IP: {1} Org: {2})", player.getDisplayName(), ipInfo.ipAddress, ipInfo.org));
 			}
 			
 			// Alert online staff members
-			if (Main.INSTANCE.CONFIG.get("alertOnlineStaff").equals("true"))
+			if (ConfigUtils.CONFIG.isAlertOnlineStaff())
 			{
 				for (Player staff : Main.INSTANCE.getServer().getOnlinePlayers())
 				{
@@ -75,9 +75,9 @@ public class Utils
 	{
 		String key = "";
 		
-		if (!Main.INSTANCE.CONFIG.get("apiKey").equals(""))
+		if (!ConfigUtils.CONFIG.getApiKey().equals(""))
 		{
-			key = "/" + Main.INSTANCE.CONFIG.get("apiKey");
+			key = "/" + ConfigUtils.CONFIG.getApiKey();
 		}
 		
 		String url = MessageFormat.format("http://api.vpnblocker.net/v2/json/{0}{1}", ip, key);
@@ -98,7 +98,7 @@ public class Utils
 				// only check remaining if there is an api key
 				if (key.equals(""))
 				{
-					if (jsonString.getRemainingRequests() <= Integer.parseInt(Main.INSTANCE.CONFIG.get("remainingRequestsWarning")))
+					if (jsonString.getRemainingRequests() <= (ConfigUtils.CONFIG.getRemainingRequestsWarning()))
 					{
 						Logging.LogInfo(MessageFormat.format("You have {0} VPNBlocker.net requests left!", jsonString.getRemainingRequests()));
 					}
@@ -111,7 +111,7 @@ public class Utils
 				ipInfo.org = jsonString.getOrg();
 				ipInfo.instant = DateTime.now().toInstant();
 				
-				if (Main.INSTANCE.CONFIG.get("useCache").equals("true"))
+				if (ConfigUtils.CONFIG.isUseCache())
 				{
 					Main.INSTANCE.CACHE.addToCache(ipInfo);
 				}
@@ -159,13 +159,9 @@ public class Utils
 	// Check if an IP is whitelisted in the config
 	public boolean isWhitelisted(String ip)
 	{
-		String[] whitelistedIps = Main.INSTANCE.CONFIG.get("whitelistedIps").split(",");
-		
-		for (String whitelistedIp : whitelistedIps)
-		{
-			if (ip.equalsIgnoreCase(whitelistedIp))
-				return true;
-		}
-		return false;
+		List<String> whitelistedIps = ConfigUtils.CONFIG.getWhitelistedIps();
+		Optional<String> foundIp = whitelistedIps.stream().filter(i -> i.equals(ip)).findFirst();
+
+		return foundIp.isPresent();
 	}
 }

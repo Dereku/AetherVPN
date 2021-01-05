@@ -1,35 +1,57 @@
 package com.icebergcraft.aethervpn;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
+
+import java.io.*;
 import java.util.Properties;
 
-public class Config
+public class ConfigUtils
 {	
-	String CONFIG_FILE = "plugins/AetherVPN/config.properties";
-	
+	public final String CONFIG_FILE_LOC = "plugins/AetherVPN/config.json";
+	private final File CONFIG_FILE = new File(CONFIG_FILE_LOC);
+	public static ConfigModel CONFIG;
+
+	public void setupConfig()
+	{
+		checkConfig();
+		load();
+	}
+
 	public void checkConfig()
-	{		
-		File config = new File(CONFIG_FILE);
-		
-		if(!config.exists())
+	{
+		if(!CONFIG_FILE.exists())
 		{
 			createConfig();
 		}
 	}
-	
+
 	public void createConfig()
+	{
+		try
+		{
+			CONFIG_FILE.getParentFile().mkdirs();
+			CONFIG_FILE.createNewFile();
+			CONFIG = new ConfigModel();
+			CONFIG.getDefaultConfig();
+			save();
+		}
+		catch (Exception ex)
+		{
+			Logging.LogError("Error creating cache!");
+			ex.printStackTrace();
+		}
+	}
+	
+	public void createConfig1()
 	{
 		Properties prop = new Properties();
 		OutputStream output = null;
 
 		try
 		{
-			File config = new File(CONFIG_FILE);
+			File config = new File(CONFIG_FILE_LOC);
 			config.getParentFile().mkdirs();
 			config.createNewFile();
 		}
@@ -40,7 +62,7 @@ public class Config
 		
 		try
 		{
-			output = new FileOutputStream(CONFIG_FILE);
+			output = new FileOutputStream(CONFIG_FILE_LOC);
 			
 			prop.setProperty("apiKey", "");
 			
@@ -94,7 +116,7 @@ public class Config
 		Properties prop = new Properties();
 		InputStream input = null;
 		
-		File config = new File(CONFIG_FILE);
+		File config = new File(CONFIG_FILE_LOC);
 		
 		if(!config.exists())
 		{
@@ -112,10 +134,10 @@ public class Config
 		
 		try 
 		{
-			input = new FileInputStream(CONFIG_FILE);
+			input = new FileInputStream(CONFIG_FILE_LOC);
 			prop.load(input);
 
-			FileOutputStream output = new FileOutputStream(CONFIG_FILE);
+			FileOutputStream output = new FileOutputStream(CONFIG_FILE_LOC);
 			
 			prop.setProperty(property, value);
 			prop.store(output, null);
@@ -148,7 +170,7 @@ public class Config
 		Properties prop = new Properties();
 		InputStream input = null;
 		
-		File config = new File(CONFIG_FILE);
+		File config = new File(CONFIG_FILE_LOC);
 		
 		if(!config.exists())
 		{
@@ -166,7 +188,7 @@ public class Config
 		
 		try 
 		{
-			input = new FileInputStream(CONFIG_FILE);
+			input = new FileInputStream(CONFIG_FILE_LOC);
 			prop.load(input);
 
 			return(prop.getProperty(property));
@@ -192,5 +214,40 @@ public class Config
 			}
 		}
 		return null;
+	}
+
+	public void load()
+	{
+		try
+		{
+			JsonReader reader = new JsonReader(new FileReader(CONFIG_FILE_LOC));
+			CONFIG = new Gson().fromJson(reader, ConfigModel.class);
+		}
+		catch (FileNotFoundException ex)
+		{
+			Logging.LogError("Failed to load config!");
+			Logging.LogError(ex);
+		}
+	}
+
+	public void save()
+	{
+		try
+		{
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String newJson = gson.toJson(CONFIG, ConfigModel.class);
+
+			FileOutputStream outputStream = new FileOutputStream(CONFIG_FILE_LOC);
+			OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+
+			writer.write(newJson);
+			writer.close();
+			outputStream.close();
+		}
+		catch (Exception ex)
+		{
+			Logging.LogError("Error saving config!");
+			Logging.LogError(ex);
+		}
 	}
 }

@@ -5,21 +5,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Type;
 import java.util.Optional;
 
 import org.joda.time.DateTime;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
-public class Cache
+public class CacheUtils
 {
 	public final String CACHE_FILE_LOC = "plugins/AetherVPN/cache.json";
 	private final File CACHE_FILE = new File(CACHE_FILE_LOC);
-	public static ListIpInfo CACHE;
+	public static CacheModel CACHE;
 
 	public void setupCache()
 	{
@@ -83,12 +81,8 @@ public class Cache
 			CACHE_FILE.getParentFile().mkdirs();
 			CACHE_FILE.createNewFile();
 			
-			FileOutputStream outputStream = new FileOutputStream(CACHE_FILE);
-			OutputStreamWriter osWriter = new OutputStreamWriter(outputStream);
-			
-			osWriter.write("{ \"IPList\": [] }");
-			osWriter.close();
-			outputStream.close();
+			CACHE = new CacheModel();
+			save();
 		}
 		catch (Exception ex)
 		{
@@ -100,7 +94,7 @@ public class Cache
 	public void clearCache()
 	{
 		CACHE_FILE.delete();
-		checkCache();
+		setupCache();
 	}
 	
 	public void addToCache(IpInfo ipInfo)
@@ -117,11 +111,10 @@ public class Cache
 
 	public void load()
 	{
-		JsonReader reader;
 		try
 		{
-			reader = new JsonReader(new FileReader(CACHE_FILE_LOC));
-			CACHE = new Gson().fromJson(reader, ListIpInfo.class);
+			JsonReader reader = new JsonReader(new FileReader(CACHE_FILE_LOC));
+			CACHE = new Gson().fromJson(reader, CacheModel.class);
 		}
 		catch (FileNotFoundException ex)
 		{
@@ -133,9 +126,8 @@ public class Cache
 	{
 		try
 		{
-			Type listType = new TypeToken<ListIpInfo>(){}.getType();
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			String newJson = gson.toJson(CACHE, listType);
+			String newJson = gson.toJson(CACHE, CacheModel.class);
 
 			FileOutputStream outputStream = new FileOutputStream(CACHE_FILE_LOC);
 			OutputStreamWriter writer = new OutputStreamWriter(outputStream);
@@ -147,7 +139,7 @@ public class Cache
 		catch (Exception ex)
 		{
 			Logging.LogError("Error saving cache!");
-			ex.printStackTrace();
+			Logging.LogError(ex);
 		}
 	}
 

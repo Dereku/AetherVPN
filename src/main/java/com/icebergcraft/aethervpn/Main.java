@@ -20,8 +20,8 @@ public class Main extends JavaPlugin
 {
 	public static Main INSTANCE;
 	public Utils UTILS;
-	public Cache CACHE;
-	public Config CONFIG;
+	public CacheUtils CACHE;
+	public ConfigUtils CONFIG;
 	
 	public Permissions Permissions;
 	
@@ -33,10 +33,10 @@ public class Main extends JavaPlugin
 	{
 		INSTANCE = this;
 		UTILS = new Utils();
-		CACHE = new Cache();
-		CONFIG = new Config();
+		CACHE = new CacheUtils();
+		CONFIG = new ConfigUtils();
 		
-		CONFIG.checkConfig();
+		CONFIG.setupConfig();
 		CACHE.setupCache();
 		
 		PluginManager pm = getServer().getPluginManager();
