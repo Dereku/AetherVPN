@@ -10,11 +10,6 @@ public class AVPlayerListener extends PlayerListener
 	{		
 		Player player = event.getPlayer();
 		
-		Main.instance.getServer().getScheduler().scheduleAsyncDelayedTask(Main.instance, new Runnable() {
-
-		    public void run() {
-		    	Main.instance.utils.checkPlayer(player);
-		    }
-		}, 0L);
+		Main.INSTANCE.getServer().getScheduler().scheduleAsyncDelayedTask(Main.INSTANCE, () -> Main.INSTANCE.UTILS.checkPlayer(player), 0L);
 	}
 }

@@ -2,7 +2,8 @@ package com.icebergcraft.aethervpn;
 
 import org.joda.time.Instant;
 
-public class IpInfo {
+public class IpInfo
+{
 	String ipAddress;
 	boolean isHost;
 	String org;

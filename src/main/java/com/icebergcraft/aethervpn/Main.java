@@ -18,34 +18,35 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class Main extends JavaPlugin
 {
-	public static Main instance;
-	public Utils utils;
-	public Cache cache;
-	public Config config;
+	public static Main INSTANCE;
+	public Utils UTILS;
+	public Cache CACHE;
+	public Config CONFIG;
 	
 	public Permissions Permissions;
 	
 	private final AVPlayerListener playerListener = new AVPlayerListener();
 	
-	String version = "1.0.0.1";
+	String version = "1.0.1";
 	
 	public void onEnable()
 	{
-		instance = this;
-		utils = new Utils();
-		cache = new Cache();
-		config = new Config();
+		INSTANCE = this;
+		UTILS = new Utils();
+		CACHE = new Cache();
+		CONFIG = new Config();
 		
-		instance.config.checkConfig();
+		INSTANCE.CONFIG.checkConfig();
 		
 		PluginManager pm = getServer().getPluginManager();
 		
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
+		Logging.LogInfo(String.format("Loaded %s by Johnanater, version: %s",  getDescription().getName(), version));
 	}
 	
 	public void onDisable()
 	{
-		
+		Logging.LogInfo(MessageFormat.format("Unloaded {0} by Johnanater, version: {1}",  getDescription().getName(), version));
 	}
 	
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
@@ -60,18 +61,19 @@ public class Main extends JavaPlugin
     		Player target = getServer().getPlayer(args[0]);
     		
     		if (target == null)
-    			sender.sendMessage("That player isn't online!");
+			{
+				sender.sendMessage("That player isn't online!");
+				return false;
+			}
     		
-    		Main.instance.getServer().getScheduler().scheduleAsyncDelayedTask(Main.instance, new Runnable() {
+    		Main.INSTANCE.getServer().getScheduler().scheduleAsyncDelayedTask(Main.INSTANCE, () ->
+			{
+				IpInfo ipInfo = UTILS.getIpInfo(UTILS.getPlayerIp(target));
 
-    		    public void run() {
-    	    		IpInfo ipInfo = utils.getIpInfo(utils.getPlayerIp(target));
-    	    		
-    	    		sender.sendMessage(MessageFormat.format("Info for {0}:", target.getName()));
-    	    		sender.sendMessage(MessageFormat.format("IP Address: {0}", ipInfo.ipAddress));
-    	    		sender.sendMessage(MessageFormat.format("IP Org: {0} IsHost: {1}", ipInfo.org, ipInfo.isHost));
-    		    }
-    		}, 0L);
+				sender.sendMessage(MessageFormat.format("Info for {0}:", target.getName()));
+				sender.sendMessage(MessageFormat.format("IP Address: {0}", ipInfo.ipAddress));
+				sender.sendMessage(MessageFormat.format("IP Org: {0} IsHost: {1}", ipInfo.org, ipInfo.isHost));
+			}, 0L);
     		
     		return true;
     	}
@@ -83,22 +85,20 @@ public class Main extends JavaPlugin
     			return false;
     		}
     		
-    		Main.instance.getServer().getScheduler().scheduleAsyncDelayedTask(Main.instance, new Runnable() {
+    		Main.INSTANCE.getServer().getScheduler().scheduleAsyncDelayedTask(Main.INSTANCE, () ->
+			{
+				IpInfo ipInfo = UTILS.getIpInfo(args[0]);
 
-    		    public void run() {
-    	    		IpInfo ipInfo = utils.getIpInfo(args[0]);
-    	    		
-    	    		try
-    	    		{
-    	    			sender.sendMessage(MessageFormat.format("Info for {0}:", ipInfo.ipAddress));
-    	    			sender.sendMessage(MessageFormat.format("IP Org: {0} IsHost: {1}", ipInfo.org, ipInfo.isHost));
-    	    		}
-    	    		catch (Exception e)
-    	    		{
-    	    			sender.sendMessage("There has been an error with the API!");
-    	    		}
-    		    }
-    		}, 0L);
+				try
+				{
+					sender.sendMessage(MessageFormat.format("Info for {0}:", ipInfo.ipAddress));
+					sender.sendMessage(MessageFormat.format("IP Org: {0} IsHost: {1}", ipInfo.org, ipInfo.isHost));
+				}
+				catch (Exception ex)
+				{
+					sender.sendMessage("There has been an error with the API!");
+				}
+			}, 0L);
 
     		return true;
     	}
@@ -115,7 +115,7 @@ public class Main extends JavaPlugin
     		// Enable the plugin
     		if (args[0].equalsIgnoreCase("enable"))
     		{
-    			config.set("enabled", "true");
+    			CONFIG.set("enabled", "true");
     			sender.sendMessage("AetherVPN enabled!");
     			return true;
     		}
@@ -123,7 +123,7 @@ public class Main extends JavaPlugin
     		// Disable the plugin
     		if (args[0].equalsIgnoreCase("disable"))
     		{
-    			config.set("enabled", "false");
+    			CONFIG.set("enabled", "false");
     			sender.sendMessage("AetherVPN disabled!");
     			return true;
     		}
@@ -131,7 +131,7 @@ public class Main extends JavaPlugin
     		// Clear cache
     		if (args[0].equalsIgnoreCase("clearcache"))
     		{
-    			cache.ClearCache();
+    			CACHE.ClearCache();
     			sender.sendMessage("Cleared IP cache!");
     			return true;
     		}
@@ -161,5 +161,4 @@ public class Main extends JavaPlugin
             
         return false;
     }
-    
 }

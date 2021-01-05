@@ -16,12 +16,12 @@ import com.google.gson.stream.JsonReader;
 
 public class Cache
 {
-	String cacheFile = "plugins/AetherVPN/cache.json";
-	File cache = new File(cacheFile);
+	public final String CACHE_FILE = "plugins/AetherVPN/cache.json";
+	private final File CACHE = new File(CACHE_FILE);
 	
 	public void CheckCache()
 	{
-		if (!cache.exists())
+		if (!CACHE.exists())
 		{
 			CreateCache();
 		}
@@ -33,7 +33,7 @@ public class Cache
 		
 		try
 		{
-			JsonReader reader = new JsonReader(new FileReader(cacheFile));
+			JsonReader reader = new JsonReader(new FileReader(CACHE_FILE));
 			
 			ListIpInfo jsonString = new Gson().fromJson(reader, ListIpInfo.class);
 			
@@ -41,10 +41,10 @@ public class Cache
 			{
 				if (ipInfo.ipAddress.equals(ip))
 				{
-					int days = Integer.parseInt(Main.instance.config.get("cacheTimeDays"));
+					int days = Integer.parseInt(Main.INSTANCE.CONFIG.get("cacheTimeDays"));
 					
 					// Cache expired
-					if (Main.instance.config.get("expireCache").equals("true") && ipInfo.instant.toDateTime().plusDays(days).isBefore(DateTime.now()))
+					if (Main.INSTANCE.CONFIG.get("expireCache").equals("true") && ipInfo.instant.toDateTime().plusDays(days).isBefore(DateTime.now()))
 					{
 						removeFromCache(ipInfo);
 						return false;
@@ -53,10 +53,10 @@ public class Cache
 				}
 			}			
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
 			Logging.LogError("Error checking if IP is cached");
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
 		return false;
 	}
@@ -68,10 +68,8 @@ public class Cache
 		JsonReader reader;
 		try
 		{
-			reader = new JsonReader(new FileReader(cacheFile));
+			reader = new JsonReader(new FileReader(CACHE_FILE));
 			ListIpInfo jsonString = new Gson().fromJson(reader, ListIpInfo.class);
-			
-			//ipInfo = jsonString.getIpList().stream().findAny().filter(CachedIpInfo -> CachedIpInfo.ipAddress.equals(ip)).get();
 			
 			for (IpInfo cachedIpInfo : jsonString.getIpList())
 			{
@@ -82,10 +80,10 @@ public class Cache
 				}
 			}
 		}
-		catch (FileNotFoundException e)
+		catch (FileNotFoundException ex)
 		{
 			Logging.LogError("Error getting cached IpInfo!");
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
 		
 		return ipInfo;
@@ -95,27 +93,27 @@ public class Cache
 	{
 		try
 		{
-			cache.getParentFile().mkdirs();
-			cache.createNewFile();
+			CACHE.getParentFile().mkdirs();
+			CACHE.createNewFile();
 			
-			FileOutputStream outputStream = new FileOutputStream(cache);
+			FileOutputStream outputStream = new FileOutputStream(CACHE);
 			OutputStreamWriter osWriter = new OutputStreamWriter(outputStream);
 			
 			osWriter.write("{ \"IPList\": [] }");
 			osWriter.close();
 			outputStream.close();
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
 			Logging.LogError("Error creating cache!");
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
 
 	}
 	
 	public void ClearCache()
 	{
-		cache.delete();
+		CACHE.delete();
 		CheckCache();
 	}
 	
@@ -125,7 +123,7 @@ public class Cache
 		
 		try
 		{
-			JsonReader reader = new JsonReader(new FileReader(cacheFile));
+			JsonReader reader = new JsonReader(new FileReader(CACHE_FILE));
 			
 			ListIpInfo jsonString = new Gson().fromJson(reader, ListIpInfo.class);
 			
@@ -135,17 +133,17 @@ public class Cache
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			String newJson = gson.toJson(jsonString, listType);
 			
-			FileOutputStream outputStream = new FileOutputStream(cacheFile);
+			FileOutputStream outputStream = new FileOutputStream(CACHE_FILE);
 			OutputStreamWriter osWriter = new OutputStreamWriter(outputStream);
 			
 			osWriter.write(newJson);
 			osWriter.close();
 			outputStream.close();
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
 			Logging.LogError("Error adding to cache!");
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
 	}
 	
@@ -153,7 +151,7 @@ public class Cache
 	{
 		try
 		{
-			JsonReader reader = new JsonReader(new FileReader(cacheFile));
+			JsonReader reader = new JsonReader(new FileReader(CACHE_FILE));
 			
 			ListIpInfo jsonString = new Gson().fromJson(reader, ListIpInfo.class);
 			
@@ -163,17 +161,17 @@ public class Cache
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			String newJson = gson.toJson(jsonString, listType);
 			
-			FileOutputStream outputStream = new FileOutputStream(cacheFile);
+			FileOutputStream outputStream = new FileOutputStream(CACHE_FILE);
 			OutputStreamWriter osWriter = new OutputStreamWriter(outputStream);
 			
 			osWriter.write(newJson);
 			osWriter.close();
 			outputStream.close();
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
 			Logging.LogError("Error removing from cache!");
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
 	}
 }

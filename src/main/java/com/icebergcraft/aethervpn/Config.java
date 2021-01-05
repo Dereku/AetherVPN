@@ -10,11 +10,11 @@ import java.util.Properties;
 
 public class Config
 {	
-	String configFile = "plugins/AetherVPN/config.properties";
+	String CONFIG_FILE = "plugins/AetherVPN/config.properties";
 	
 	public void checkConfig()
 	{		
-		File config = new File(configFile);
+		File config = new File(CONFIG_FILE);
 		
 		if(!config.exists())
 		{
@@ -26,24 +26,21 @@ public class Config
 	{
 		Properties prop = new Properties();
 		OutputStream output = null;
-		
-		
+
 		try
 		{
-			File config = new File(configFile);
+			File config = new File(CONFIG_FILE);
 			config.getParentFile().mkdirs();
 			config.createNewFile();
-			
-			
 		}
-		catch (IOException e)
+		catch (IOException ex)
 		{
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
 		
 		try
 		{
-			output = new FileOutputStream(configFile);
+			output = new FileOutputStream(CONFIG_FILE);
 			
 			prop.setProperty("apiKey", "");
 			
@@ -69,9 +66,9 @@ public class Config
 			prop.store(output, null);
 		}
 		
-		catch (IOException e)
+		catch (IOException ex)
 		{	
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
 		
 		finally
@@ -84,9 +81,9 @@ public class Config
 					output.close();
 				}
 				
-				catch (IOException e) 
+				catch (IOException ex)
 				{
-					e.printStackTrace();
+					ex.printStackTrace();
 				}
 			}	
 		}
@@ -97,7 +94,7 @@ public class Config
 		Properties prop = new Properties();
 		InputStream input = null;
 		
-		File config = new File(configFile);
+		File config = new File(CONFIG_FILE);
 		
 		if(!config.exists())
 		{
@@ -107,18 +104,18 @@ public class Config
 				checkConfig();
 			}
 			
-			catch (IOException e)
+			catch (IOException ex)
 			{
-				e.printStackTrace();
+				ex.printStackTrace();
 			}
 		}
 		
 		try 
 		{
-			input = new FileInputStream(configFile);
+			input = new FileInputStream(CONFIG_FILE);
 			prop.load(input);
 
-			FileOutputStream output = new FileOutputStream(configFile);
+			FileOutputStream output = new FileOutputStream(CONFIG_FILE);
 			
 			prop.setProperty(property, value);
 			prop.store(output, null);
@@ -137,9 +134,9 @@ public class Config
 				{
 					input.close();
 				}
-				catch (IOException e)
+				catch (IOException ex)
 				{
-					e.printStackTrace();
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -151,7 +148,7 @@ public class Config
 		Properties prop = new Properties();
 		InputStream input = null;
 		
-		File config = new File(configFile);
+		File config = new File(CONFIG_FILE);
 		
 		if(!config.exists())
 		{
@@ -161,15 +158,15 @@ public class Config
 				checkConfig();
 			}
 			
-			catch (IOException e)
+			catch (IOException ex)
 			{
-				e.printStackTrace();
+				ex.printStackTrace();
 			}
 		}
 		
 		try 
 		{
-			input = new FileInputStream(configFile);
+			input = new FileInputStream(CONFIG_FILE);
 			prop.load(input);
 
 			return(prop.getProperty(property));
@@ -188,9 +185,9 @@ public class Config
 				{
 					input.close();
 				}
-				catch (IOException e)
+				catch (IOException ex)
 				{
-					e.printStackTrace();
+					ex.printStackTrace();
 				}
 			}
 		}

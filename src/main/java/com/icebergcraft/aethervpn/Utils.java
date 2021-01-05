@@ -17,17 +17,17 @@ public class Utils
 		IpInfo ipInfo = getIpInfo(getPlayerIp(player));
 		
 		// Log joins
-		if (Main.instance.config.get("logJoins").equals("true"))
+		if (Main.INSTANCE.CONFIG.get("logJoins").equals("true"))
 		{
 			Logging.LogInfo(MessageFormat.format("{0} has joined with the IP: {1} Org: {2}", player.getName(), ipInfo.ipAddress, ipInfo.org));
 		}
 		
 		// Alert online staff members
-		if (Main.instance.config.get("alertOnlineStaff").equals("true"))
+		if (Main.INSTANCE.CONFIG.get("alertOnlineStaff").equals("true"))
 		{
-			for (Player staff : Main.instance.getServer().getOnlinePlayers())
+			for (Player staff : Main.INSTANCE.getServer().getOnlinePlayers())
 			{
-				if (Main.instance.hasPermission(staff, "aethervpn.alert"))
+				if (Main.INSTANCE.hasPermission(staff, "aethervpn.alert"))
 				{
 					staff.sendMessage(MessageFormat.format("{0} has joined with the IP: {1} Org: {2}", player.getName(), ipInfo.ipAddress, ipInfo.org));
 				}
@@ -35,22 +35,22 @@ public class Utils
 		}
 		
 		if (ipInfo.isHost && 
-			Main.instance.config.get("blockVPNs").equals("true") &&
+			Main.INSTANCE.CONFIG.get("blockVPNs").equals("true") &&
 			!isWhitelisted(ipInfo.ipAddress) &&
 			!canBypass(player))
 		{
 			// Log kicks
-			if (Main.instance.config.get("logJoins").equals("true"))
+			if (Main.INSTANCE.CONFIG.get("logJoins").equals("true"))
 			{
 				Logging.LogInfo(MessageFormat.format("{0} has been kicked for using a VPN! (IP: {1} Org: {2})", player.getDisplayName(), ipInfo.ipAddress, ipInfo.org));
 			}
 			
 			// Alert online staff members
-			if (Main.instance.config.get("alertOnlineStaff").equals("true"))
+			if (Main.INSTANCE.CONFIG.get("alertOnlineStaff").equals("true"))
 			{
-				for (Player staff : Main.instance.getServer().getOnlinePlayers())
+				for (Player staff : Main.INSTANCE.getServer().getOnlinePlayers())
 				{
-					if (Main.instance.hasPermission(staff, "aethervpn.alert"))
+					if (Main.INSTANCE.hasPermission(staff, "aethervpn.alert"))
 					{
 						staff.sendMessage(MessageFormat.format("{0} has been kicked for using a VPN! (IP: {1} Org: {2})", player.getDisplayName(), ipInfo.ipAddress, ipInfo.org));
 					}
@@ -64,11 +64,11 @@ public class Utils
 	// Get IpInfo
 	public IpInfo getIpInfo(String ip)
 	{
-		IpInfo ipInfo = new IpInfo();
+		IpInfo ipInfo;
 		
-		if (Main.instance.cache.isCached(ip))
+		if (Main.INSTANCE.CACHE.isCached(ip))
 		{
-			ipInfo = Main.instance.cache.getCachedIpInfo(ip);
+			ipInfo = Main.INSTANCE.CACHE.getCachedIpInfo(ip);
 		}
 		else
 		{
@@ -83,9 +83,9 @@ public class Utils
 	{
 		String key = "";
 		
-		if (!Main.instance.config.get("apiKey").equals(""))
+		if (!Main.INSTANCE.CONFIG.get("apiKey").equals(""))
 		{
-			key = "/" + Main.instance.config.get("apiKey");
+			key = "/" + Main.INSTANCE.CONFIG.get("apiKey");
 		}
 		
 		String url = MessageFormat.format("http://api.vpnblocker.net/v2/json/{0}{1}", ip, key);
@@ -104,9 +104,9 @@ public class Utils
 			if (status.equals("success"))
 			{
 				// only check remaining if there is an api key
-				if (key == "")
+				if (key.equals(""))
 				{
-					if (jsonString.getRemainingRequests() <= Integer.parseInt(Main.instance.config.get("remainingRequestsWarning")))
+					if (jsonString.getRemainingRequests() <= Integer.parseInt(Main.INSTANCE.CONFIG.get("remainingRequestsWarning")))
 					{
 						Logging.LogInfo(MessageFormat.format("You have {0} VPNBlocker.net requests left!", jsonString.getRemainingRequests()));
 					}
@@ -119,9 +119,9 @@ public class Utils
 				ipInfo.org = jsonString.getOrg();
 				ipInfo.instant = DateTime.now().toInstant();
 				
-				if (Main.instance.config.get("useCache").equals("true"))
+				if (Main.INSTANCE.CONFIG.get("useCache").equals("true"))
 				{
-					Main.instance.cache.addToCache(ipInfo);
+					Main.INSTANCE.CACHE.addToCache(ipInfo);
 				}
 				return ipInfo;
 			}
@@ -140,10 +140,10 @@ public class Utils
 			}			
 		}
 		// API ded
-		catch (UnirestException e)
+		catch (UnirestException ex)
 		{
 			Logging.LogError("Error with the VPNBlocker.net API!");
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
 		return null;
 	}
@@ -158,18 +158,16 @@ public class Utils
 	// Check if user has permission to bypass
 	public boolean canBypass(Player player)
 	{
-		if (Main.instance.hasPermission(player, "aethervpn.bypass"))
+		if (Main.INSTANCE.hasPermission(player, "aethervpn.bypass"))
 			return true;
-		if (player.isOp())
-			return true;
-		
-		return false;
+
+		return player.isOp();
 	}
 	
 	// Check if an IP is whitelisted in the config
 	public boolean isWhitelisted(String ip)
 	{
-		String[] whitelistedIps = Main.instance.config.get("whitelistedIps").split(",");
+		String[] whitelistedIps = Main.INSTANCE.CONFIG.get("whitelistedIps").split(",");
 		
 		for (String whitelistedIp : whitelistedIps)
 		{
