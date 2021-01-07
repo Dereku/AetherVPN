@@ -42,6 +42,11 @@ public class ConfigModel
         return enabled;
     }
 
+    public void setEnabled(boolean newEnabled)
+    {
+        enabled = newEnabled;
+    }
+
     public boolean getBlockVPNs()
     {
         return blockVPNs;

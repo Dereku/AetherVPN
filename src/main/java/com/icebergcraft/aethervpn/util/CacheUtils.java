@@ -44,10 +44,10 @@ public class CacheUtils
 
 		if (ipInfo.isPresent())
 		{
-			int days = Integer.parseInt(Main.INSTANCE.CONFIG.get("cacheTimeDays"));
+			int days = ConfigUtils.CONFIG.getCacheTimeDays();
 
 			// Cache expired
-			if (Main.INSTANCE.CONFIG.get("expireCache").equals("true") && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now()))
+			if (ConfigUtils.CONFIG.isExpireCache() && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now()))
 			{
 				removeFromCache(ipInfo.get());
 				return false;
@@ -64,10 +64,10 @@ public class CacheUtils
 
 		if (ipInfo.isPresent())
 		{
-			int days = Integer.parseInt(Main.INSTANCE.CONFIG.get("cacheTimeDays"));
+			int days = ConfigUtils.CONFIG.getCacheTimeDays();
 
 			// Cache expired
-			if (Main.INSTANCE.CONFIG.get("expireCache").equals("true") && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now()))
+			if (ConfigUtils.CONFIG.isExpireCache() && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now()))
 			{
 				removeFromCache(ipInfo.get());
 				return Optional.empty();

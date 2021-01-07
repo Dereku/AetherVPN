@@ -1,14 +1,12 @@
 package com.icebergcraft.aethervpn;
 
-import java.text.MessageFormat;
-
-import com.avaje.ebeaninternal.server.core.Message;
 import com.icebergcraft.aethervpn.listener.AVPlayerListener;
 import com.icebergcraft.aethervpn.model.IpInfo;
 import com.icebergcraft.aethervpn.util.CacheUtils;
 import com.icebergcraft.aethervpn.util.ConfigUtils;
 import com.icebergcraft.aethervpn.util.Logging;
 import com.icebergcraft.aethervpn.util.Utils;
+import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,11 +15,10 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.nijikokun.bukkit.Permissions.Permissions;
-
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
+
+import java.text.MessageFormat;
 
 public class Main extends JavaPlugin
 {
@@ -123,7 +120,7 @@ public class Main extends JavaPlugin
     		// Enable the plugin
     		if (args[0].equalsIgnoreCase("enable"))
     		{
-    			CONFIG.set("enabled", "true");
+    			ConfigUtils.CONFIG.setEnabled(true);
     			sender.sendMessage("AetherVPN enabled!");
     			return true;
     		}
@@ -131,7 +128,8 @@ public class Main extends JavaPlugin
     		// Disable the plugin
     		if (args[0].equalsIgnoreCase("disable"))
     		{
-    			CONFIG.set("enabled", "false");
+    			ConfigUtils.CONFIG.setEnabled(false);
+				CONFIG.scheduleSave();
     			sender.sendMessage("AetherVPN disabled!");
     			return true;
     		}
@@ -140,6 +138,7 @@ public class Main extends JavaPlugin
     		if (args[0].equalsIgnoreCase("clearcache"))
     		{
     			CACHE.clearCache();
+				CONFIG.scheduleSave();
     			sender.sendMessage("Cleared IP cache!");
     			return true;
     		}
