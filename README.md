@@ -59,9 +59,9 @@ and use Gradle to build it.
 
 **Help:**
 
-If you still need help feel free to contact me on Discord: Johnanater#6836
+If you still need help feel free to contact me on
 
-or on my Discord server: https://discord.gg/VTCzMVG
+my Discord server: https://discord.gg/DpxvCTh
 
 ---	
 
