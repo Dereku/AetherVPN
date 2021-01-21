@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 public class Main extends JavaPlugin {
     public static Main INSTANCE;
     private final AVPlayerListener playerListener = new AVPlayerListener();
-    private final String version = "1.1.0";
     public Utils UTILS;
     public CacheUtils CACHE;
     public ConfigUtils CONFIG;
@@ -36,11 +35,15 @@ public class Main extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
-        Logging.LogInfo(MessageFormat.format("Loaded {0} by Johnanater, version: {1}", getDescription().getName(), version));
+        Logging.LogInfo(MessageFormat.format(
+                "Loaded {0} by Johnanater, version: {1}", getDescription().getName(), getDescription().getVersion()
+        ));
     }
 
     public void onDisable() {
-        Logging.LogInfo(MessageFormat.format("Unloaded {0} by Johnanater, version: {1}", getDescription().getName(), version));
+        Logging.LogInfo(MessageFormat.format(
+                "Unloaded {0} by Johnanater, version: {1}", getDescription().getName(), getDescription().getVersion()
+        ));
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -91,7 +94,7 @@ public class Main extends JavaPlugin {
         if (cmd.getName().equalsIgnoreCase("aethervpn") && sender.hasPermission("aethervpn.command.aethervpn")) {
             // Display version info
             if (args.length == 0) {
-                sender.sendMessage(MessageFormat.format("AetherVPN by Johnanater, version {0}", version));
+                sender.sendMessage("AetherVPN by Johnanater, version " + getDescription().getVersion());
                 return false;
             }
 

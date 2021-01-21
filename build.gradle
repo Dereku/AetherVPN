@@ -4,7 +4,7 @@ plugins {
   id 'java'
 }
 
-// This version is copied to Main.java, and plugin.yml
+// This version is copied to plugin.yml
 version '1.1.0'
 
 repositories {
@@ -33,7 +33,6 @@ allprojects {
 }
 
 def updateVersion() {
-  updateFile('src/main/java/com/icebergcraft/aethervpn/Main.java', /private final String version = .*/, "private final String version = \"${version}\";" )
   updateFile('src/main/resources/plugin.yml', /version: .*/, "version: ${version}" )
 }
 
