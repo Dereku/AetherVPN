@@ -5,8 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConfigModel
-{
+public class ConfigModel {
     @SerializedName("Enabled")
     private boolean enabled;
 
@@ -37,63 +36,51 @@ public class ConfigModel
     @SerializedName("WhitelistedIps")
     private String whitelistedIps;
 
-    public boolean getEnabled()
-    {
+    public boolean getEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean newEnabled)
-    {
+    public void setEnabled(boolean newEnabled) {
         enabled = newEnabled;
     }
 
-    public boolean getBlockVPNs()
-    {
+    public boolean getBlockVPNs() {
         return blockVPNs;
     }
 
-    public String getApiKey()
-    {
+    public String getApiKey() {
         return apiKey;
     }
 
-    public int getRemainingRequestsWarning()
-    {
+    public int getRemainingRequestsWarning() {
         return remainingRequestsWarning;
     }
 
-    public boolean isUseCache()
-    {
+    public boolean isUseCache() {
         return useCache;
     }
 
-    public boolean isExpireCache()
-    {
+    public boolean isExpireCache() {
         return expireCache;
     }
 
-    public int getCacheTimeDays()
-    {
+    public int getCacheTimeDays() {
         return cacheTimeDays;
     }
 
-    public boolean isLogJoins()
-    {
+    public boolean isLogJoins() {
         return logJoins;
     }
 
-    public boolean isAlertOnlineStaff()
-    {
+    public boolean isAlertOnlineStaff() {
         return alertOnlineStaff;
     }
 
-    public List<String> getWhitelistedIps()
-    {
+    public List<String> getWhitelistedIps() {
         return Arrays.asList(whitelistedIps.split(","));
     }
 
-    public ConfigModel getDefaultConfig()
-    {
+    public ConfigModel getDefaultConfig() {
         enabled = true;
         blockVPNs = true;
         apiKey = "";
