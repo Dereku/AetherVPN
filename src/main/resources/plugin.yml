@@ -7,13 +7,29 @@ softdepend: [PermissionsEx, Permissions]
 commands:
     aethervpn:
         description: Show plugin info
+        permission: aethervpn.command.aethervpn
         usage: /aethervpn [<enable/disable/clearcache>]
     playerinfo:
         description: Lookup a player's IP info
+        permission: aethervpn.command.playerinfo
         usage: /playerinfo <player>
     lookup:
         description: Lookup an IP's info
+        permission: aethervpn.command.lookup
         usage: /lookup <ip>
-    plugins:
-        description: e
-        usage: e
+permissions:
+    aethervpn.command.aethervpn:
+        description: Permission for /aethervpn command
+        default: op
+    aethervpn.command.playerinfo:
+        description: Permission for /playerinfo command
+        default: op
+    aethervpn.command.lookup:
+        description: Permission for /lookup command
+        default: op
+    aethervpn.feature.alert:
+        description: Permission for alert feature
+        default: op
+    aethervpn.feature.bypass:
+        description: Permission for bypass feature
+        default: op

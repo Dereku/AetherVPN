@@ -6,17 +6,13 @@ import com.icebergcraft.aethervpn.util.CacheUtils;
 import com.icebergcraft.aethervpn.util.ConfigUtils;
 import com.icebergcraft.aethervpn.util.Logging;
 import com.icebergcraft.aethervpn.util.Utils;
-import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.tehkode.permissions.PermissionManager;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.text.MessageFormat;
 
@@ -27,7 +23,6 @@ public class Main extends JavaPlugin {
     public Utils UTILS;
     public CacheUtils CACHE;
     public ConfigUtils CONFIG;
-    public Permissions Permissions;
 
     public void onEnable() {
         INSTANCE = this;
@@ -49,7 +44,7 @@ public class Main extends JavaPlugin {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("playerinfo") && hasPermission((Player) sender, "aethervpn.playerinfo")) {
+        if (cmd.getName().equalsIgnoreCase("playerinfo") && sender.hasPermission("aethervpn.command.playerinfo")) {
             if (args.length == 0) {
                 return false;
             }
@@ -73,7 +68,7 @@ public class Main extends JavaPlugin {
             return true;
         }
 
-        if (cmd.getName().equalsIgnoreCase("lookup") && hasPermission((Player) sender, "aethervpn.lookup")) {
+        if (cmd.getName().equalsIgnoreCase("lookup") && sender.hasPermission("aethervpn.command.lookup")) {
             if (args.length == 0) {
                 return false;
             }
@@ -93,7 +88,7 @@ public class Main extends JavaPlugin {
             return true;
         }
 
-        if (cmd.getName().equalsIgnoreCase("aethervpn") && hasPermission((Player) sender, "aethervpn")) {
+        if (cmd.getName().equalsIgnoreCase("aethervpn") && sender.hasPermission("aethervpn.command.aethervpn")) {
             // Display version info
             if (args.length == 0) {
                 sender.sendMessage(MessageFormat.format("AetherVPN by Johnanater, version {0}", version));
@@ -124,25 +119,5 @@ public class Main extends JavaPlugin {
             }
         }
         return true;
-    }
-
-    public boolean hasPermission(Player player, String permission) {
-        if (player.isOp())
-            return true;
-
-        PluginManager pm = getServer().getPluginManager();
-
-        final Plugin permExPlugin = pm.getPlugin("PermissionsEx");
-        if (permExPlugin != null && permExPlugin.isEnabled()) {
-            PermissionManager manager = PermissionsEx.getPermissionManager();
-            return manager.has(player, permission);
-        }
-
-        final Plugin permPlugin = pm.getPlugin("Permissions");
-        if (permPlugin != null && permPlugin.isEnabled()) {
-            return Permissions.getHandler().has(player, permission);
-        }
-
-        return false;
     }
 }

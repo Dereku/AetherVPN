@@ -26,16 +26,18 @@
     /aethervpn - View plugin information
     /aethervpn <enable/disable> - Enable or disable the VPN check
     /aethervpn clearcache
-	/lookup <player> - View a player's IP information
+	/playerinfo <player> - View a player's IP information
+	/lookup <ip> - View an IP information
 
 **Permissions:**
 
 This plugin supports PermissionsEx, YetiPermissions, and GroupManager (with Fake YetiPermissions bridge)
 
-    aethervpn - /aethervpn
-	aethervpn.lookup - /lookup
-    aethervpn.alert - Get alerted when a player joins the server
-    aethervpn.bypass - Bypass VPN check
+    aethervpn.command.aethervpn - /aethervpn
+	aethervpn.command.lookup - /lookup
+	aethervpn.command.playerinfo - /playerinfo
+    aethervpn.feature.alert - Get alerted when a player joins the server
+    aethervpn.feature.bypass - Bypass VPN check
 
 ---
 

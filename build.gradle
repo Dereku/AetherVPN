@@ -15,10 +15,6 @@ repositories {
 dependencies {
   // Local CraftBukkit jar (1092)
   implementation files('lib/CraftBukkit1092.jar')
-  // Local Permissions (Yeti)
-  implementation files('lib/Permissions.jar')
-  // Local PermissionsEx (1.12)
-  implementation files('lib/PermissionsEx-1.12.jar')
 
   compile 'com.mashape.unirest:unirest-java:1.4.9'
   compile 'com.google.code.gson:gson:2.8.5'

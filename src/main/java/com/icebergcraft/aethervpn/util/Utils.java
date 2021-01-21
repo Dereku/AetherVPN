@@ -26,7 +26,7 @@ public class Utils {
         // Alert online staff members
         if (ConfigUtils.CONFIG.isAlertOnlineStaff()) {
             for (Player staff : Main.INSTANCE.getServer().getOnlinePlayers()) {
-                if (Main.INSTANCE.hasPermission(staff, "aethervpn.alert")) {
+                if (staff.hasPermission("aethervpn.feature.alert")) {
                     staff.sendMessage(MessageFormat.format("{0} has joined with the IP: {1} Org: {2}", player.getName(), ipInfo.ipAddress, ipInfo.org));
                 }
             }
@@ -44,7 +44,7 @@ public class Utils {
             // Alert online staff members
             if (ConfigUtils.CONFIG.isAlertOnlineStaff()) {
                 for (Player staff : Main.INSTANCE.getServer().getOnlinePlayers()) {
-                    if (Main.INSTANCE.hasPermission(staff, "aethervpn.alert")) {
+                    if (staff.hasPermission("aethervpn.feature.alert")) {
                         staff.sendMessage(MessageFormat.format("{0} has been kicked for using a VPN! (IP: {1} Org: {2})", player.getDisplayName(), ipInfo.ipAddress, ipInfo.org));
                     }
                 }
@@ -129,7 +129,7 @@ public class Utils {
 
     // Check if user has permission to bypass
     public boolean canBypass(Player player) {
-        if (Main.INSTANCE.hasPermission(player, "aethervpn.bypass"))
+        if (player.hasPermission("aethervpn.feature.bypass"))
             return true;
 
         return player.isOp();
