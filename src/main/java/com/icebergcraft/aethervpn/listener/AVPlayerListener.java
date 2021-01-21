@@ -6,9 +6,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 
 public class AVPlayerListener extends PlayerListener {
+    private final Main plugin;
+
+    public AVPlayerListener(Main main) {
+        this.plugin = main;
+    }
+
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        Main.INSTANCE.getServer().getScheduler().scheduleAsyncDelayedTask(Main.INSTANCE, () -> Main.INSTANCE.UTILS.checkPlayer(player), 0L);
+        this.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(this.plugin, () -> this.plugin.getUtils().checkPlayer(player), 0L);
     }
 }

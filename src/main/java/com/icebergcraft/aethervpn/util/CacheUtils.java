@@ -12,31 +12,34 @@ import java.io.*;
 import java.util.Optional;
 
 public class CacheUtils {
-    public static CacheModel CACHE;
-    public final String CACHE_FILE_LOC = "plugins/AetherVPN/cache.json";
-    private final File CACHE_FILE = new File(CACHE_FILE_LOC);
+    private final File cacheFile;
+    private final Main plugin;
+    private CacheModel cacheModel;
+
+    public CacheUtils(Main main) {
+        this.plugin = main;
+        this.cacheFile = new File(this.plugin.getDataFolder(), "cache.json");
+    }
+
+    public CacheModel getCacheModel() {
+        return cacheModel;
+    }
 
     public void setupCache() {
-        checkCache();
-
-        // setup the variable
+        if (!cacheFile.exists()) {
+            createCache();
+        }
         load();
     }
 
-    public void checkCache() {
-        if (!CACHE_FILE.exists()) {
-            createCache();
-        }
-    }
-
     public boolean isCached(String ip) {
-        Optional<IpInfo> ipInfo = CACHE.getIpList().stream().filter(i -> i.ipAddress.equals(ip)).findFirst();
+        Optional<IpInfo> ipInfo = getCacheModel().getIpList().stream().filter(i -> i.ipAddress.equals(ip)).findFirst();
 
         if (ipInfo.isPresent()) {
-            int days = ConfigUtils.CONFIG.getCacheTimeDays();
+            int days = this.plugin.getConfig().getCacheTimeDays();
 
             // Cache expired
-            if (ConfigUtils.CONFIG.isExpireCache() && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now())) {
+            if (this.plugin.getConfig().isExpireCache() && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now())) {
                 removeFromCache(ipInfo.get());
                 return false;
             }
@@ -47,13 +50,13 @@ public class CacheUtils {
     }
 
     public Optional<IpInfo> getCachedIpInfo(String ip) {
-        Optional<IpInfo> ipInfo = CACHE.getIpList().stream().filter(i -> i.ipAddress.equals(ip)).findFirst();
+        Optional<IpInfo> ipInfo = getCacheModel().getIpList().stream().filter(i -> i.ipAddress.equals(ip)).findFirst();
 
         if (ipInfo.isPresent()) {
-            int days = ConfigUtils.CONFIG.getCacheTimeDays();
+            int days = this.plugin.getConfig().getCacheTimeDays();
 
             // Cache expired
-            if (ConfigUtils.CONFIG.isExpireCache() && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now())) {
+            if (this.plugin.getConfig().isExpireCache() && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now())) {
                 removeFromCache(ipInfo.get());
                 return Optional.empty();
             }
@@ -64,10 +67,10 @@ public class CacheUtils {
 
     public void createCache() {
         try {
-            CACHE_FILE.getParentFile().mkdirs();
-            CACHE_FILE.createNewFile();
+            cacheFile.getParentFile().mkdirs();
+            cacheFile.createNewFile();
 
-            CACHE = new CacheModel();
+            cacheModel = new CacheModel();
             save();
         } catch (Exception ex) {
             Logging.LogError("Error creating cache!");
@@ -76,24 +79,24 @@ public class CacheUtils {
     }
 
     public void clearCache() {
-        CACHE_FILE.delete();
+        cacheFile.delete();
         setupCache();
     }
 
     public void addToCache(IpInfo ipInfo) {
-        CACHE.addIpInfo(ipInfo);
+        getCacheModel().addIpInfo(ipInfo);
         scheduleSave();
     }
 
     public void removeFromCache(IpInfo ipInfo) {
-        CACHE.removeIpInfo(ipInfo);
+        getCacheModel().removeIpInfo(ipInfo);
         scheduleSave();
     }
 
     public void load() {
         try {
-            JsonReader reader = new JsonReader(new FileReader(CACHE_FILE_LOC));
-            CACHE = new Gson().fromJson(reader, CacheModel.class);
+            JsonReader reader = new JsonReader(new FileReader(this.cacheFile));
+            cacheModel = new Gson().fromJson(reader, CacheModel.class);
         } catch (FileNotFoundException ex) {
             Logging.LogError(ex);
         }
@@ -102,9 +105,9 @@ public class CacheUtils {
     public void save() {
         try {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String newJson = gson.toJson(CACHE, CacheModel.class);
+            String newJson = gson.toJson(getCacheModel(), CacheModel.class);
 
-            FileOutputStream outputStream = new FileOutputStream(CACHE_FILE_LOC);
+            FileOutputStream outputStream = new FileOutputStream(this.cacheFile);
             OutputStreamWriter writer = new OutputStreamWriter(outputStream);
 
             writer.write(newJson);
@@ -117,6 +120,6 @@ public class CacheUtils {
     }
 
     public void scheduleSave() {
-        Main.INSTANCE.getServer().getScheduler().scheduleAsyncDelayedTask(Main.INSTANCE, this::save, 0L);
+        this.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(this.plugin, this::save, 0L);
     }
 }

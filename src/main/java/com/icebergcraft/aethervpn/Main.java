@@ -1,6 +1,7 @@
 package com.icebergcraft.aethervpn;
 
 import com.icebergcraft.aethervpn.listener.AVPlayerListener;
+import com.icebergcraft.aethervpn.model.ConfigModel;
 import com.icebergcraft.aethervpn.model.IpInfo;
 import com.icebergcraft.aethervpn.util.CacheUtils;
 import com.icebergcraft.aethervpn.util.ConfigUtils;
@@ -11,30 +12,25 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.MessageFormat;
 
 public class Main extends JavaPlugin {
-    public static Main INSTANCE;
-    private final AVPlayerListener playerListener = new AVPlayerListener();
-    public Utils UTILS;
-    public CacheUtils CACHE;
-    public ConfigUtils CONFIG;
+    private Utils utils;
+    private CacheUtils cacheUtils;
+    private ConfigUtils configUtils;
 
     public void onEnable() {
-        INSTANCE = this;
-        UTILS = new Utils();
-        CACHE = new CacheUtils();
-        CONFIG = new ConfigUtils();
+        utils = new Utils(this);
+        cacheUtils = new CacheUtils(this);
+        configUtils = new ConfigUtils(this);
 
-        CONFIG.setupConfig();
-        CACHE.setupCache();
+        configUtils.setupConfig();
+        getCacheUtils().setupCache();
 
-        PluginManager pm = getServer().getPluginManager();
-
-        pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
+        final AVPlayerListener playerListener = new AVPlayerListener(this);
+        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
         Logging.LogInfo(MessageFormat.format(
                 "Loaded {0} by Johnanater, version: {1}", getDescription().getName(), getDescription().getVersion()
         ));
@@ -59,9 +55,8 @@ public class Main extends JavaPlugin {
                 return false;
             }
 
-            Main.INSTANCE.getServer().getScheduler().scheduleAsyncDelayedTask(Main.INSTANCE, () ->
-            {
-                IpInfo ipInfo = UTILS.getIpInfo(UTILS.getPlayerIp(target));
+            this.getServer().getScheduler().scheduleAsyncDelayedTask(this, () -> {
+                IpInfo ipInfo = getUtils().getIpInfo(getUtils().getPlayerIp(target));
 
                 sender.sendMessage(MessageFormat.format("Info for {0}:", target.getName()));
                 sender.sendMessage(MessageFormat.format("IP Address: {0}", ipInfo.ipAddress));
@@ -76,9 +71,8 @@ public class Main extends JavaPlugin {
                 return false;
             }
 
-            Main.INSTANCE.getServer().getScheduler().scheduleAsyncDelayedTask(Main.INSTANCE, () ->
-            {
-                IpInfo ipInfo = UTILS.getIpInfo(args[0]);
+            this.getServer().getScheduler().scheduleAsyncDelayedTask(this, () -> {
+                IpInfo ipInfo = getUtils().getIpInfo(args[0]);
 
                 try {
                     sender.sendMessage(MessageFormat.format("Info for {0}:", ipInfo.ipAddress));
@@ -100,27 +94,40 @@ public class Main extends JavaPlugin {
 
             // Enable the plugin
             if (args[0].equalsIgnoreCase("enable")) {
-                ConfigUtils.CONFIG.setEnabled(true);
+                getConfig().setEnabled(true);
+                configUtils.scheduleSave();
                 sender.sendMessage("AetherVPN enabled!");
                 return true;
             }
 
             // Disable the plugin
             if (args[0].equalsIgnoreCase("disable")) {
-                ConfigUtils.CONFIG.setEnabled(false);
-                CONFIG.scheduleSave();
+                getConfig().setEnabled(false);
+                configUtils.scheduleSave();
                 sender.sendMessage("AetherVPN disabled!");
                 return true;
             }
 
             // Clear cache
             if (args[0].equalsIgnoreCase("clearcache")) {
-                CACHE.clearCache();
-                CONFIG.scheduleSave();
+                getCacheUtils().clearCache();
+                configUtils.scheduleSave();
                 sender.sendMessage("Cleared IP cache!");
                 return true;
             }
         }
         return true;
+    }
+
+    public Utils getUtils() {
+        return utils;
+    }
+
+    public CacheUtils getCacheUtils() {
+        return cacheUtils;
+    }
+
+    public ConfigModel getConfig() {
+        return configUtils.getConfig();
     }
 }

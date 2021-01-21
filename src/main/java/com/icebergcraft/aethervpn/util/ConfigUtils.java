@@ -9,27 +9,32 @@ import com.icebergcraft.aethervpn.model.ConfigModel;
 import java.io.*;
 
 public class ConfigUtils {
-    public static ConfigModel CONFIG;
-    public final String CONFIG_FILE_LOC = "plugins/AetherVPN/config.json";
-    private final File CONFIG_FILE = new File(CONFIG_FILE_LOC);
+    private final File configFile;
+    private final Main plugin;
+    private ConfigModel config;
 
-    public void setupConfig() {
-        checkConfig();
-        load();
+    public ConfigUtils(Main main) {
+        this.plugin = main;
+        this.configFile = new File(this.plugin.getDataFolder(), "config.json");
     }
 
-    public void checkConfig() {
-        if (!CONFIG_FILE.exists()) {
+    public ConfigModel getConfig() {
+        return config;
+    }
+
+    public void setupConfig() {
+        if (!configFile.exists()) {
             createConfig();
         }
+        load();
     }
 
     public void createConfig() {
         try {
-            CONFIG_FILE.getParentFile().mkdirs();
-            CONFIG_FILE.createNewFile();
-            CONFIG = new ConfigModel();
-            CONFIG.getDefaultConfig();
+            configFile.getParentFile().mkdirs();
+            configFile.createNewFile();
+            config = new ConfigModel();
+            config.getDefaultConfig();
             save();
         } catch (Exception ex) {
             Logging.LogError("Error creating cache!");
@@ -39,8 +44,8 @@ public class ConfigUtils {
 
     public void load() {
         try {
-            JsonReader reader = new JsonReader(new FileReader(CONFIG_FILE_LOC));
-            CONFIG = new Gson().fromJson(reader, ConfigModel.class);
+            JsonReader reader = new JsonReader(new FileReader(this.configFile));
+            config = new Gson().fromJson(reader, ConfigModel.class);
         } catch (FileNotFoundException ex) {
             Logging.LogError("Failed to load config!");
             Logging.LogError(ex);
@@ -50,9 +55,9 @@ public class ConfigUtils {
     public void save() {
         try {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String newJson = gson.toJson(CONFIG, ConfigModel.class);
+            String newJson = gson.toJson(getConfig(), ConfigModel.class);
 
-            FileOutputStream outputStream = new FileOutputStream(CONFIG_FILE_LOC);
+            FileOutputStream outputStream = new FileOutputStream(this.configFile);
             OutputStreamWriter writer = new OutputStreamWriter(outputStream);
 
             writer.write(newJson);
@@ -65,6 +70,6 @@ public class ConfigUtils {
     }
 
     public void scheduleSave() {
-        Main.INSTANCE.getServer().getScheduler().scheduleAsyncDelayedTask(Main.INSTANCE, this::save, 0L);
+        this.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(this.plugin, this::save, 0L);
     }
 }

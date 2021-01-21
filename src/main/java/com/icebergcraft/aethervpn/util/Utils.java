@@ -2,6 +2,7 @@ package com.icebergcraft.aethervpn.util;
 
 import com.google.gson.Gson;
 import com.icebergcraft.aethervpn.Main;
+import com.icebergcraft.aethervpn.model.ConfigModel;
 import com.icebergcraft.aethervpn.model.IpInfo;
 import com.icebergcraft.aethervpn.model.VPNBlockerRootObject;
 import com.mashape.unirest.http.Unirest;
@@ -14,18 +15,24 @@ import java.util.List;
 import java.util.Optional;
 
 public class Utils {
-    public void checkPlayer(Player player) {
+    private final Main plugin;
 
+    public Utils(Main main) {
+        this.plugin = main;
+    }
+
+    public void checkPlayer(Player player) {
+        final ConfigModel config = this.plugin.getConfig();
         IpInfo ipInfo = getIpInfo(getPlayerIp(player));
 
         // Log joins
-        if (ConfigUtils.CONFIG.isLogJoins()) {
+        if (config.isLogJoins()) {
             Logging.LogInfo(MessageFormat.format("{0} has joined with the IP: {1} Org: {2}", player.getName(), ipInfo.ipAddress, ipInfo.org));
         }
 
         // Alert online staff members
-        if (ConfigUtils.CONFIG.isAlertOnlineStaff()) {
-            for (Player staff : Main.INSTANCE.getServer().getOnlinePlayers()) {
+        if (config.isAlertOnlineStaff()) {
+            for (Player staff : this.plugin.getServer().getOnlinePlayers()) {
                 if (staff.hasPermission("aethervpn.feature.alert")) {
                     staff.sendMessage(MessageFormat.format("{0} has joined with the IP: {1} Org: {2}", player.getName(), ipInfo.ipAddress, ipInfo.org));
                 }
@@ -33,17 +40,17 @@ public class Utils {
         }
 
         if (ipInfo.isHost &&
-                ConfigUtils.CONFIG.getBlockVPNs() &&
+                config.getBlockVPNs() &&
                 !isWhitelisted(ipInfo.ipAddress) &&
                 !canBypass(player)) {
             // Log kicks
-            if (ConfigUtils.CONFIG.isLogJoins()) {
+            if (config.isLogJoins()) {
                 Logging.LogInfo(MessageFormat.format("{0} has been kicked for using a VPN! (IP: {1} Org: {2})", player.getDisplayName(), ipInfo.ipAddress, ipInfo.org));
             }
 
             // Alert online staff members
-            if (ConfigUtils.CONFIG.isAlertOnlineStaff()) {
-                for (Player staff : Main.INSTANCE.getServer().getOnlinePlayers()) {
+            if (config.isAlertOnlineStaff()) {
+                for (Player staff : this.plugin.getServer().getOnlinePlayers()) {
                     if (staff.hasPermission("aethervpn.feature.alert")) {
                         staff.sendMessage(MessageFormat.format("{0} has been kicked for using a VPN! (IP: {1} Org: {2})", player.getDisplayName(), ipInfo.ipAddress, ipInfo.org));
                     }
@@ -56,17 +63,18 @@ public class Utils {
 
     // Get IpInfo
     public IpInfo getIpInfo(String ip) {
-        Optional<IpInfo> ipInfoCached = Main.INSTANCE.CACHE.getCachedIpInfo(ip);
+        Optional<IpInfo> ipInfoCached = this.plugin.getCacheUtils().getCachedIpInfo(ip);
 
         return ipInfoCached.orElseGet(() -> DownloadIpInfo(ip));
     }
 
     // Download IpInfo from API
     public IpInfo DownloadIpInfo(String ip) {
+        final ConfigModel config = this.plugin.getConfig();
         String key = "";
 
-        if (!ConfigUtils.CONFIG.getApiKey().equals("")) {
-            key = "/" + ConfigUtils.CONFIG.getApiKey();
+        if (!config.getApiKey().equals("")) {
+            key = "/" + config.getApiKey();
         }
 
         String url = MessageFormat.format("http://api.vpnblocker.net/v2/json/{0}{1}", ip, key);
@@ -84,7 +92,7 @@ public class Utils {
             if (status.equals("success")) {
                 // only check remaining if there is an api key
                 if (key.equals("")) {
-                    if (jsonString.getRemainingRequests() <= (ConfigUtils.CONFIG.getRemainingRequestsWarning())) {
+                    if (jsonString.getRemainingRequests() <= (config.getRemainingRequestsWarning())) {
                         Logging.LogInfo(MessageFormat.format("You have {0} VPNBlocker.net requests left!", jsonString.getRemainingRequests()));
                     }
                 }
@@ -96,8 +104,8 @@ public class Utils {
                 ipInfo.org = jsonString.getOrg();
                 ipInfo.instant = DateTime.now().toInstant();
 
-                if (ConfigUtils.CONFIG.isUseCache()) {
-                    Main.INSTANCE.CACHE.addToCache(ipInfo);
+                if (config.isUseCache()) {
+                    this.plugin.getCacheUtils().addToCache(ipInfo);
                 }
                 return ipInfo;
             }
@@ -137,7 +145,7 @@ public class Utils {
 
     // Check if an IP is whitelisted in the config
     public boolean isWhitelisted(String ip) {
-        List<String> whitelistedIps = ConfigUtils.CONFIG.getWhitelistedIps();
+        List<String> whitelistedIps = this.plugin.getConfig().getWhitelistedIps();
         Optional<String> foundIp = whitelistedIps.stream().filter(i -> i.equals(ip)).findFirst();
 
         return foundIp.isPresent();
