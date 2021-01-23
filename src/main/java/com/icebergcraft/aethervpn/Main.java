@@ -15,11 +15,20 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main extends JavaPlugin {
+
+    private Logging log;
     private Utils utils;
     private CacheUtils cacheUtils;
     private ConfigUtils configUtils;
+
+    @Override
+    public void onLoad() {
+        this.log = new Logging(this);
+    }
 
     public void onEnable() {
         utils = new Utils(this);
@@ -31,15 +40,17 @@ public class Main extends JavaPlugin {
 
         final AVPlayerListener playerListener = new AVPlayerListener(this);
         getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
-        Logging.LogInfo(MessageFormat.format(
-                "Loaded {0} by Johnanater, version: {1}", getDescription().getName(), getDescription().getVersion()
-        ));
+        this.getLogger().log(Level.INFO,
+                "Loaded {0} by Johnanater, version: {1}",
+                new Object[]{getDescription().getName(), getDescription().getVersion()}
+        );
     }
 
     public void onDisable() {
-        Logging.LogInfo(MessageFormat.format(
-                "Unloaded {0} by Johnanater, version: {1}", getDescription().getName(), getDescription().getVersion()
-        ));
+        this.getLogger().log(Level.INFO,
+                "Unloaded {0} by Johnanater, version: {1}",
+                new Object[]{getDescription().getName(), getDescription().getVersion()}
+        );
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -117,6 +128,10 @@ public class Main extends JavaPlugin {
             }
         }
         return true;
+    }
+
+    public Logger getLogger() {
+        return this.log;
     }
 
     public Utils getUtils() {

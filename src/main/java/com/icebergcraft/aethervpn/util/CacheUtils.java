@@ -10,6 +10,7 @@ import org.joda.time.DateTime;
 
 import java.io.*;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class CacheUtils {
     private final File cacheFile;
@@ -73,7 +74,7 @@ public class CacheUtils {
             cacheModel = new CacheModel();
             save();
         } catch (Exception ex) {
-            Logging.LogError("Error creating cache!");
+            this.plugin.getLogger().log(Level.WARNING,"Error creating cache!");
             ex.printStackTrace();
         }
     }
@@ -98,7 +99,7 @@ public class CacheUtils {
             JsonReader reader = new JsonReader(new FileReader(this.cacheFile));
             cacheModel = new Gson().fromJson(reader, CacheModel.class);
         } catch (FileNotFoundException ex) {
-            Logging.LogError(ex);
+            this.plugin.getLogger().log(Level.WARNING, "Error loading cache", ex);
         }
     }
 
@@ -114,8 +115,7 @@ public class CacheUtils {
             writer.close();
             outputStream.close();
         } catch (Exception ex) {
-            Logging.LogError("Error saving cache!");
-            Logging.LogError(ex);
+            this.plugin.getLogger().log(Level.WARNING,"Error saving cache!", ex);
         }
     }
 

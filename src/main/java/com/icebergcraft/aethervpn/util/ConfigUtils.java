@@ -7,6 +7,7 @@ import com.icebergcraft.aethervpn.Main;
 import com.icebergcraft.aethervpn.model.ConfigModel;
 
 import java.io.*;
+import java.util.logging.Level;
 
 public class ConfigUtils {
     private final File configFile;
@@ -37,8 +38,7 @@ public class ConfigUtils {
             config.getDefaultConfig();
             save();
         } catch (Exception ex) {
-            Logging.LogError("Error creating cache!");
-            ex.printStackTrace();
+            this.plugin.getLogger().log(Level.WARNING, "Error creating cache!", ex);
         }
     }
 
@@ -47,8 +47,7 @@ public class ConfigUtils {
             JsonReader reader = new JsonReader(new FileReader(this.configFile));
             config = new Gson().fromJson(reader, ConfigModel.class);
         } catch (FileNotFoundException ex) {
-            Logging.LogError("Failed to load config!");
-            Logging.LogError(ex);
+            this.plugin.getLogger().log(Level.WARNING, "Failed to load config!", ex);
         }
     }
 
@@ -64,8 +63,7 @@ public class ConfigUtils {
             writer.close();
             outputStream.close();
         } catch (Exception ex) {
-            Logging.LogError("Error saving config!");
-            Logging.LogError(ex);
+            this.plugin.getLogger().log(Level.WARNING, "Error saving config!", ex);
         }
     }
 

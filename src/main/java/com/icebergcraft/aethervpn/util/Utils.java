@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class Utils {
     private final Main plugin;
@@ -27,7 +28,7 @@ public class Utils {
 
         // Log joins
         if (config.isLogJoins()) {
-            Logging.LogInfo(MessageFormat.format("{0} has joined with the IP: {1} Org: {2}", player.getName(), ipInfo.ipAddress, ipInfo.org));
+            this.plugin.getLogger().log(Level.INFO, "{0} has joined with the IP: {1} Org: {2}", new Object[]{player.getName(), ipInfo.ipAddress, ipInfo.org});
         }
 
         // Alert online staff members
@@ -45,7 +46,7 @@ public class Utils {
                 !canBypass(player)) {
             // Log kicks
             if (config.isLogJoins()) {
-                Logging.LogInfo(MessageFormat.format("{0} has been kicked for using a VPN! (IP: {1} Org: {2})", player.getDisplayName(), ipInfo.ipAddress, ipInfo.org));
+                this.plugin.getLogger().log(Level.INFO, "{0} has been kicked for using a VPN! (IP: {1} Org: {2})", new Object[]{player.getDisplayName(), ipInfo.ipAddress, ipInfo.org});
             }
 
             // Alert online staff members
@@ -93,7 +94,7 @@ public class Utils {
                 // only check remaining if there is an api key
                 if (key.equals("")) {
                     if (jsonString.getRemainingRequests() <= (config.getRemainingRequestsWarning())) {
-                        Logging.LogInfo(MessageFormat.format("You have {0} VPNBlocker.net requests left!", jsonString.getRemainingRequests()));
+                        this.plugin.getLogger().log(Level.INFO, "You have {0} VPNBlocker.net requests left!", jsonString.getRemainingRequests());
                     }
                 }
 
@@ -114,17 +115,16 @@ public class Utils {
             String msg = jsonString.getMsg();
 
             if (status.equals("failed") && !msg.equals("Invalid IP Address")) {
-                Logging.LogError("VPNBlocker.net API returned failed! Status Message: " + msg);
+                this.plugin.getLogger().log(Level.WARNING, "VPNBlocker.net API returned failed! Status Message: " + msg);
 
                 if (msg.equals("Monthly Request Limit Reached")) {
-                    Logging.LogError("You have no more VPNBlocket.net requests left! This plugin will only used cached IPs!");
+                    this.plugin.getLogger().log(Level.WARNING,"You have no more VPNBlocket.net requests left! This plugin will only used cached IPs!");
                 }
             }
         }
         // API ded
         catch (UnirestException ex) {
-            Logging.LogError("Error with the VPNBlocker.net API!");
-            ex.printStackTrace();
+            this.plugin.getLogger().log(Level.WARNING,"Error with the VPNBlocker.net API!", ex);
         }
         return null;
     }
