@@ -6,9 +6,10 @@ import com.google.gson.stream.JsonReader;
 import com.icebergcraft.aethervpn.Main;
 import com.icebergcraft.aethervpn.model.CacheModel;
 import com.icebergcraft.aethervpn.model.IpInfo;
-import org.joda.time.DateTime;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -38,9 +39,8 @@ public class CacheUtils {
 
         if (ipInfo.isPresent()) {
             int days = this.plugin.getConfig().getCacheTimeDays();
-
             // Cache expired
-            if (this.plugin.getConfig().isExpireCache() && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now())) {
+            if (this.plugin.getConfig().isExpireCache() && LocalDateTime.ofInstant(ipInfo.get().instant, ZoneOffset.UTC).plusDays(days).isBefore(LocalDateTime.now())) {
                 removeFromCache(ipInfo.get());
                 return false;
             }
@@ -57,7 +57,7 @@ public class CacheUtils {
             int days = this.plugin.getConfig().getCacheTimeDays();
 
             // Cache expired
-            if (this.plugin.getConfig().isExpireCache() && ipInfo.get().instant.toDateTime().plusDays(days).isBefore(DateTime.now())) {
+            if (this.plugin.getConfig().isExpireCache() && LocalDateTime.ofInstant(ipInfo.get().instant, ZoneOffset.UTC).plusDays(days).isBefore(LocalDateTime.now())) {
                 removeFromCache(ipInfo.get());
                 return Optional.empty();
             }

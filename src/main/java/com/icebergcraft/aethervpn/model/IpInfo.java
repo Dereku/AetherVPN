@@ -1,6 +1,6 @@
 package com.icebergcraft.aethervpn.model;
 
-import org.joda.time.Instant;
+import java.time.Instant;
 
 public class IpInfo {
     public String ipAddress;

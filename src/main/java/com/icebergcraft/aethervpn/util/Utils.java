@@ -6,7 +6,6 @@ import com.icebergcraft.aethervpn.model.ConfigModel;
 import com.icebergcraft.aethervpn.model.IpInfo;
 import com.icebergcraft.aethervpn.model.VPNBlockerRootObject;
 import org.bukkit.entity.Player;
-import org.joda.time.DateTime;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,6 +15,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -119,7 +120,7 @@ public class Utils {
             ipInfo.ipAddress = jsonString.getIpaddress();
             ipInfo.isHost = jsonString.getHostIp();
             ipInfo.org = jsonString.getOrg();
-            ipInfo.instant = DateTime.now().toInstant();
+            ipInfo.instant = LocalDateTime.now().toInstant(ZoneOffset.UTC);
 
             if (config.isUseCache()) {
                 this.plugin.getCacheUtils().addToCache(ipInfo);
