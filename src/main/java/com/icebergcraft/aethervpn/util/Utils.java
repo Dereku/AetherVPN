@@ -12,8 +12,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.List;
@@ -88,9 +88,11 @@ public class Utils {
         String jsonDownload;
         try {
             URL url = new URL(urlString);
-            final URLConnection urlConnection = url.openConnection();
-            try (InputStream inputStream = urlConnection.getInputStream();
-                 InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+            final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            // They banned all java User-Agents? kek.
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:7.0.1) Gecko/20100101 Firefox/7.0.1");
+            InputStream inputStream = conn.getResponseCode() == 200 ? conn.getInputStream() : conn.getErrorStream();
+            try (InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
                  BufferedReader br = new BufferedReader(isr)) {
                 jsonDownload = br.lines().collect(Collectors.joining(System.lineSeparator()));
             }
