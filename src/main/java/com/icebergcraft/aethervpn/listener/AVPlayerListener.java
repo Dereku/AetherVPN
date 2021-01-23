@@ -14,7 +14,8 @@ public class AVPlayerListener extends PlayerListener {
 
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-
-        this.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(this.plugin, () -> this.plugin.getUtils().checkPlayer(player), 0L);
+        if (this.plugin.getConfig().getEnabled()) {
+            this.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(this.plugin, () -> this.plugin.getUtils().checkPlayer(player), 0L);
+        }
     }
 }

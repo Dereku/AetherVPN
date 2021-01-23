@@ -5,36 +5,37 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class ConfigModel {
     @SerializedName("Enabled")
-    private boolean enabled;
+    private boolean enabled = true;
 
     @SerializedName("BlockVPNs")
-    private boolean blockVPNs;
+    private boolean blockVPNs = true;
 
     @SerializedName("ApiKey")
-    private String apiKey;
+    private String apiKey = "";
 
     @SerializedName("RemainingRequestsWarning")
-    private int remainingRequestsWarning;
+    private int remainingRequestsWarning = 25;
 
     @SerializedName("UseCache")
-    private boolean useCache;
+    private boolean useCache = true;
 
     @SerializedName("ExpireCache")
-    private boolean expireCache;
+    private boolean expireCache = true;
 
     @SerializedName("CacheTimeDays")
-    private int cacheTimeDays;
+    private int cacheTimeDays = 40;
 
     @SerializedName("LogJoins")
-    private boolean logJoins;
+    private boolean logJoins = true;
 
     @SerializedName("AlertOnlineStaff")
-    private boolean alertOnlineStaff;
+    private boolean alertOnlineStaff = true;
 
     @SerializedName("WhitelistedIps")
-    private String whitelistedIps;
+    private String whitelistedIps = "127.0.0.1,192.168.1.1";
 
     public boolean getEnabled() {
         return enabled;
@@ -79,20 +80,4 @@ public class ConfigModel {
     public List<String> getWhitelistedIps() {
         return Arrays.asList(whitelistedIps.split(","));
     }
-
-    public ConfigModel getDefaultConfig() {
-        enabled = true;
-        blockVPNs = true;
-        apiKey = "";
-        remainingRequestsWarning = 25;
-        useCache = true;
-        expireCache = true;
-        cacheTimeDays = 40;
-        logJoins = true;
-        alertOnlineStaff = true;
-        whitelistedIps = "127.0.0.1,192.168.1.1";
-
-        return this;
-    }
-
 }

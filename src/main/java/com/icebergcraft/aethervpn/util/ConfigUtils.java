@@ -7,6 +7,7 @@ import com.icebergcraft.aethervpn.Main;
 import com.icebergcraft.aethervpn.model.ConfigModel;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 
 public class ConfigUtils {
@@ -35,7 +36,6 @@ public class ConfigUtils {
             configFile.getParentFile().mkdirs();
             configFile.createNewFile();
             config = new ConfigModel();
-            config.getDefaultConfig();
             save();
         } catch (Exception ex) {
             this.plugin.getLogger().log(Level.WARNING, "Error creating cache!", ex);
@@ -55,7 +55,7 @@ public class ConfigUtils {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String newJson = gson.toJson(getConfig(), ConfigModel.class);
         try (FileOutputStream outputStream = new FileOutputStream(this.configFile);
-             OutputStreamWriter writer = new OutputStreamWriter(outputStream)) {
+             OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
             writer.write(newJson);
         } catch (Exception ex) {
             this.plugin.getLogger().log(Level.WARNING, "Error saving config!", ex);
