@@ -74,8 +74,7 @@ public class CacheUtils {
             cacheModel = new CacheModel();
             save();
         } catch (Exception ex) {
-            this.plugin.getLogger().log(Level.WARNING,"Error creating cache!");
-            ex.printStackTrace();
+            this.plugin.getLogger().log(Level.WARNING, "Error creating cache!", ex);
         }
     }
 
@@ -95,27 +94,22 @@ public class CacheUtils {
     }
 
     public void load() {
-        try {
-            JsonReader reader = new JsonReader(new FileReader(this.cacheFile));
+        try (FileReader fr = new FileReader(this.cacheFile)) {
+            JsonReader reader = new JsonReader(fr);
             cacheModel = new Gson().fromJson(reader, CacheModel.class);
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             this.plugin.getLogger().log(Level.WARNING, "Error loading cache", ex);
         }
     }
 
     public void save() {
-        try {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String newJson = gson.toJson(getCacheModel(), CacheModel.class);
-
-            FileOutputStream outputStream = new FileOutputStream(this.cacheFile);
-            OutputStreamWriter writer = new OutputStreamWriter(outputStream);
-
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String newJson = gson.toJson(getCacheModel(), CacheModel.class);
+        try (FileOutputStream outputStream = new FileOutputStream(this.cacheFile);
+             OutputStreamWriter writer = new OutputStreamWriter(outputStream)) {
             writer.write(newJson);
-            writer.close();
-            outputStream.close();
         } catch (Exception ex) {
-            this.plugin.getLogger().log(Level.WARNING,"Error saving cache!", ex);
+            this.plugin.getLogger().log(Level.WARNING, "Error saving cache!", ex);
         }
     }
 

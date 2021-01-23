@@ -43,25 +43,20 @@ public class ConfigUtils {
     }
 
     public void load() {
-        try {
-            JsonReader reader = new JsonReader(new FileReader(this.configFile));
+        try (FileReader fr = new FileReader(this.configFile)) {
+            JsonReader reader = new JsonReader(fr);
             config = new Gson().fromJson(reader, ConfigModel.class);
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             this.plugin.getLogger().log(Level.WARNING, "Failed to load config!", ex);
         }
     }
 
     public void save() {
-        try {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String newJson = gson.toJson(getConfig(), ConfigModel.class);
-
-            FileOutputStream outputStream = new FileOutputStream(this.configFile);
-            OutputStreamWriter writer = new OutputStreamWriter(outputStream);
-
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String newJson = gson.toJson(getConfig(), ConfigModel.class);
+        try (FileOutputStream outputStream = new FileOutputStream(this.configFile);
+             OutputStreamWriter writer = new OutputStreamWriter(outputStream)) {
             writer.write(newJson);
-            writer.close();
-            outputStream.close();
         } catch (Exception ex) {
             this.plugin.getLogger().log(Level.WARNING, "Error saving config!", ex);
         }
