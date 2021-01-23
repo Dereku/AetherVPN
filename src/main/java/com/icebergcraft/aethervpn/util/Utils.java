@@ -5,15 +5,21 @@ import com.icebergcraft.aethervpn.Main;
 import com.icebergcraft.aethervpn.model.ConfigModel;
 import com.icebergcraft.aethervpn.model.IpInfo;
 import com.icebergcraft.aethervpn.model.VPNBlockerRootObject;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.bukkit.entity.Player;
 import org.joda.time.DateTime;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class Utils {
     private final Main plugin;
@@ -74,73 +80,72 @@ public class Utils {
         final ConfigModel config = this.plugin.getConfig();
         String key = "";
 
-        if (!config.getApiKey().equals("")) {
+        if (!key.equals(config.getApiKey())) {
             key = "/" + config.getApiKey();
         }
 
-        String url = MessageFormat.format("http://api.vpnblocker.net/v2/json/{0}{1}", ip, key);
-
+        String urlString = MessageFormat.format("http://api.vpnblocker.net/v2/json/{0}{1}", ip, key);
+        String jsonDownload;
         try {
-            String jsonDownload = Unirest.get(url).asString().getBody();
-
-            VPNBlockerRootObject jsonString = new Gson().fromJson(jsonDownload, VPNBlockerRootObject.class);
-
-            String status = jsonString.getStatus();
-
-            //System.out.println(jsonDownload);
-
-            // Success!
-            if (status.equals("success")) {
-                // only check remaining if there is an api key
-                if (key.equals("")) {
-                    if (jsonString.getRemainingRequests() <= (config.getRemainingRequestsWarning())) {
-                        this.plugin.getLogger().log(Level.INFO, "You have {0} VPNBlocker.net requests left!", jsonString.getRemainingRequests());
-                    }
-                }
-
-                IpInfo ipInfo = new IpInfo();
-
-                ipInfo.ipAddress = jsonString.getIpaddress();
-                ipInfo.isHost = jsonString.getHostIp();
-                ipInfo.org = jsonString.getOrg();
-                ipInfo.instant = DateTime.now().toInstant();
-
-                if (config.isUseCache()) {
-                    this.plugin.getCacheUtils().addToCache(ipInfo);
-                }
-                return ipInfo;
-            }
-
-            // The query returned failed
-            String msg = jsonString.getMsg();
-
-            if (status.equals("failed") && !msg.equals("Invalid IP Address")) {
-                this.plugin.getLogger().log(Level.WARNING, "VPNBlocker.net API returned failed! Status Message: " + msg);
-
-                if (msg.equals("Monthly Request Limit Reached")) {
-                    this.plugin.getLogger().log(Level.WARNING,"You have no more VPNBlocket.net requests left! This plugin will only used cached IPs!");
-                }
+            URL url = new URL(urlString);
+            final URLConnection urlConnection = url.openConnection();
+            try (InputStream inputStream = urlConnection.getInputStream();
+                 InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                 BufferedReader br = new BufferedReader(isr)) {
+                jsonDownload = br.lines().collect(Collectors.joining(System.lineSeparator()));
             }
         }
         // API ded
-        catch (UnirestException ex) {
-            this.plugin.getLogger().log(Level.WARNING,"Error with the VPNBlocker.net API!", ex);
+        catch (IOException ex) {
+            this.plugin.getLogger().log(Level.WARNING, "Error with the VPNBlocker.net API!", ex);
+            return null;
+        }
+        VPNBlockerRootObject jsonString = new Gson().fromJson(jsonDownload, VPNBlockerRootObject.class);
+        String status = jsonString.getStatus();
+
+        // Success!
+        if (status.equals("success")) {
+            // only check remaining if there is an api key
+            if (key.equals("")) {
+                if (jsonString.getRemainingRequests() <= (config.getRemainingRequestsWarning())) {
+                    this.plugin.getLogger().log(Level.INFO, "You have {0} VPNBlocker.net requests left!", jsonString.getRemainingRequests());
+                }
+            }
+
+            IpInfo ipInfo = new IpInfo();
+
+            ipInfo.ipAddress = jsonString.getIpaddress();
+            ipInfo.isHost = jsonString.getHostIp();
+            ipInfo.org = jsonString.getOrg();
+            ipInfo.instant = DateTime.now().toInstant();
+
+            if (config.isUseCache()) {
+                this.plugin.getCacheUtils().addToCache(ipInfo);
+            }
+            return ipInfo;
+        }
+
+        // The query returned failed
+        String msg = jsonString.getMsg();
+
+        if (status.equals("failed") && !msg.equals("Invalid IP Address")) {
+            this.plugin.getLogger().log(Level.WARNING, "VPNBlocker.net API returned failed! Status Message: " + msg);
+
+            if (msg.equals("Monthly Request Limit Reached")) {
+                this.plugin.getLogger().log(Level.WARNING, "You have no more VPNBlocket.net requests left! This plugin will only used cached IPs!");
+            }
         }
         return null;
     }
 
     // Get the actual IP of a player
     public String getPlayerIp(Player player) {
-        String ip = (player.getAddress().getAddress().toString()).replaceAll("/", "");
-        return ip;
+        return (player.getAddress().getAddress().toString()).replaceAll("/", "");
     }
 
     // Check if user has permission to bypass
     public boolean canBypass(Player player) {
-        if (player.hasPermission("aethervpn.feature.bypass"))
-            return true;
-
-        return player.isOp();
+        return player.hasPermission("aethervpn.feature.bypass") || player.isOp();
     }
 
     // Check if an IP is whitelisted in the config

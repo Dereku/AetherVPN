@@ -16,7 +16,6 @@ dependencies {
   // Local CraftBukkit jar (1092)
   implementation files('lib/CraftBukkit1092.jar')
 
-  compile 'com.mashape.unirest:unirest-java:1.4.9'
   compile 'com.google.code.gson:gson:2.8.5'
   compile 'joda-time:joda-time:2.10.1'
 }
