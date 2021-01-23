@@ -32,14 +32,8 @@ public class ConfigUtils {
     }
 
     public void createConfig() {
-        try {
-            configFile.getParentFile().mkdirs();
-            configFile.createNewFile();
-            config = new ConfigModel();
-            save();
-        } catch (Exception ex) {
-            this.plugin.getLogger().log(Level.WARNING, "Error creating cache!", ex);
-        }
+        config = new ConfigModel();
+        save();
     }
 
     public void load() {

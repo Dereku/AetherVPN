@@ -31,6 +31,7 @@ public class Main extends JavaPlugin {
     }
 
     public void onEnable() {
+        this.getDataFolder().mkdirs();
         utils = new Utils(this);
         cacheUtils = new CacheUtils(this);
         configUtils = new ConfigUtils(this);
@@ -40,11 +41,11 @@ public class Main extends JavaPlugin {
 
         final AVPlayerListener playerListener = new AVPlayerListener(this);
         getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
-        this.getLogger().log(Level.INFO, "Enabled. Version: " + getDescription().getVersion() + " by Johnanater");
+        this.getLogger().log(Level.INFO, "Enabled. Version " + getDescription().getVersion() + " by Johnanater");
     }
 
     public void onDisable() {
-        this.getLogger().log(Level.INFO, "Disabled. Version: " + getDescription().getVersion() + " by Johnanater");
+        this.getLogger().log(Level.INFO, "Disabled. Version " + getDescription().getVersion() + " by Johnanater");
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

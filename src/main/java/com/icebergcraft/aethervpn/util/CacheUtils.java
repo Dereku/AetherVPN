@@ -67,15 +67,8 @@ public class CacheUtils {
     }
 
     public void createCache() {
-        try {
-            cacheFile.getParentFile().mkdirs();
-            cacheFile.createNewFile();
-
-            cacheModel = new CacheModel();
-            save();
-        } catch (Exception ex) {
-            this.plugin.getLogger().log(Level.WARNING, "Error creating cache!", ex);
-        }
+        cacheModel = new CacheModel();
+        save();
     }
 
     public void clearCache() {

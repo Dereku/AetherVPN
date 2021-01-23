@@ -35,32 +35,41 @@ public class Utils {
 
         // Log joins
         if (config.isLogJoins()) {
-            this.plugin.getLogger().log(Level.INFO, player.getName() + " has joined with the IP: " + ipInfo.ipAddress + " Org: " + ipInfo.org);
+            this.plugin.getLogger().log(Level.INFO, MessageFormat.format(
+                    "{0} has joined with the IP: {1} Org: {2}",
+                    player.getName(), ipInfo.ipAddress, ipInfo.org
+            ));
         }
 
         // Alert online staff members
         if (config.isAlertOnlineStaff()) {
             for (Player staff : this.plugin.getServer().getOnlinePlayers()) {
                 if (staff.hasPermission("aethervpn.feature.alert")) {
-                    staff.sendMessage(player.getName() + " has joined with the IP: " + ipInfo.ipAddress + " Org: " + ipInfo.org);
+                    staff.sendMessage(MessageFormat.format(
+                            "{0} has joined with the IP: {1} Org: {2}",
+                            player.getName(), ipInfo.ipAddress, ipInfo.org
+                    ));
                 }
             }
         }
 
-        if (ipInfo.isHost &&
-                config.getBlockVPNs() &&
-                !isWhitelisted(ipInfo.ipAddress) &&
-                !canBypass(player)) {
+        if (ipInfo.isHost && config.getBlockVPNs() && !isWhitelisted(ipInfo.ipAddress) && !canBypass(player)) {
             // Log kicks
             if (config.isLogJoins()) {
-                this.plugin.getLogger().log(Level.INFO, player.getName() + " has been kicked for using a VPN! (IP: " + ipInfo.ipAddress + " Org: " + ipInfo.org + ")");
+                this.plugin.getLogger().log(Level.INFO, MessageFormat.format(
+                        "{0} has been kicked for using a VPN! (IP: {1} Org: {2})",
+                        player.getName(), ipInfo.ipAddress, ipInfo.org
+                ));
             }
 
             // Alert online staff members
             if (config.isAlertOnlineStaff()) {
                 for (Player staff : this.plugin.getServer().getOnlinePlayers()) {
                     if (staff.hasPermission("aethervpn.feature.alert")) {
-                        staff.sendMessage(player.getName() + " has been kicked for using a VPN! (IP: " + ipInfo.ipAddress + " Org: " + ipInfo.org + ")");
+                        staff.sendMessage(MessageFormat.format(
+                                "{0} has been kicked for using a VPN! (IP: {1} Org: {2})",
+                                player.getName(), ipInfo.ipAddress, ipInfo.org
+                        ));
                     }
                 }
             }
