@@ -40,17 +40,11 @@ public class Main extends JavaPlugin {
 
         final AVPlayerListener playerListener = new AVPlayerListener(this);
         getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
-        this.getLogger().log(Level.INFO,
-                "Loaded {0} by Johnanater, version: {1}",
-                new Object[]{getDescription().getName(), getDescription().getVersion()}
-        );
+        this.getLogger().log(Level.INFO, "Enabled. Version: " + getDescription().getVersion() + " by Johnanater");
     }
 
     public void onDisable() {
-        this.getLogger().log(Level.INFO,
-                "Unloaded {0} by Johnanater, version: {1}",
-                new Object[]{getDescription().getName(), getDescription().getVersion()}
-        );
+        this.getLogger().log(Level.INFO, "Disabled. Version: " + getDescription().getVersion() + " by Johnanater");
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

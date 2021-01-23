@@ -34,14 +34,14 @@ public class Utils {
 
         // Log joins
         if (config.isLogJoins()) {
-            this.plugin.getLogger().log(Level.INFO, "{0} has joined with the IP: {1} Org: {2}", new Object[]{player.getName(), ipInfo.ipAddress, ipInfo.org});
+            this.plugin.getLogger().log(Level.INFO, player.getName() + " has joined with the IP: " + ipInfo.ipAddress + " Org: " + ipInfo.org);
         }
 
         // Alert online staff members
         if (config.isAlertOnlineStaff()) {
             for (Player staff : this.plugin.getServer().getOnlinePlayers()) {
                 if (staff.hasPermission("aethervpn.feature.alert")) {
-                    staff.sendMessage(MessageFormat.format("{0} has joined with the IP: {1} Org: {2}", player.getName(), ipInfo.ipAddress, ipInfo.org));
+                    staff.sendMessage(player.getName() + " has joined with the IP: " + ipInfo.ipAddress + " Org: " + ipInfo.org);
                 }
             }
         }
@@ -52,14 +52,14 @@ public class Utils {
                 !canBypass(player)) {
             // Log kicks
             if (config.isLogJoins()) {
-                this.plugin.getLogger().log(Level.INFO, "{0} has been kicked for using a VPN! (IP: {1} Org: {2})", new Object[]{player.getDisplayName(), ipInfo.ipAddress, ipInfo.org});
+                this.plugin.getLogger().log(Level.INFO, player.getName() + " has been kicked for using a VPN! (IP: " + ipInfo.ipAddress + " Org: " + ipInfo.org + ")");
             }
 
             // Alert online staff members
             if (config.isAlertOnlineStaff()) {
                 for (Player staff : this.plugin.getServer().getOnlinePlayers()) {
                     if (staff.hasPermission("aethervpn.feature.alert")) {
-                        staff.sendMessage(MessageFormat.format("{0} has been kicked for using a VPN! (IP: {1} Org: {2})", player.getDisplayName(), ipInfo.ipAddress, ipInfo.org));
+                        staff.sendMessage(player.getName() + " has been kicked for using a VPN! (IP: " + ipInfo.ipAddress + " Org: " + ipInfo.org + ")");
                     }
                 }
             }
@@ -108,7 +108,7 @@ public class Utils {
             // only check remaining if there is an api key
             if (key.equals("")) {
                 if (jsonString.getRemainingRequests() <= (config.getRemainingRequestsWarning())) {
-                    this.plugin.getLogger().log(Level.INFO, "You have {0} VPNBlocker.net requests left!", jsonString.getRemainingRequests());
+                    this.plugin.getLogger().log(Level.INFO, "You have " + jsonString.getRemainingRequests() + " VPNBlocker.net requests left!");
                 }
             }
 
