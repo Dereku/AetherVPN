@@ -52,10 +52,9 @@ an unlimited plan is available for $5/month at https://vpnblocker.net/pricing.
 
 **Building:**
 
-In order to build the plugin, you need to download and add CraftBukkit1092.jar, 
-Permissions.jar (Yeti Permissions), and PermissionsEx-1.12.jar to your `lib` folder.
-Then you should be able to edit the plugin in your favorite IDE (Developed in IntelliJ IDEA)
-and use Gradle to build it.
+In order to build the plugin, you need to download and add CraftBukkit1092.jar
+to your `lib` folder. Then you should be able to edit the plugin in your favorite
+IDE (Developed in IntelliJ IDEA) and use Gradle to build it.
 
 ---
 
